@@ -1,3 +1,9 @@
+import { Button } from "@/components/ui/button";
+
 export default function page() {
-  return <div>page</div>;
+  return (
+    <div>
+      <Button>Button</Button>
+    </div>
+  );
 }
