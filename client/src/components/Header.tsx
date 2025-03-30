@@ -25,14 +25,16 @@ export default function Header() {
             {navList.map((navItem, i) => (
               <li key={i}>
                 <Link href={navItem.href}>
-                  <Button variant="ghost">{navItem.name}</Button>
+                  <Button variant="ghost" className="cursor-pointer">
+                    {navItem.name}
+                  </Button>
                 </Link>
               </li>
             ))}
           </ul>
 
           <Link href="/signup">
-            <Button>Sign Up</Button>
+            <Button className="cursor-pointer">Sign Up</Button>
           </Link>
         </div>
 
@@ -53,7 +55,7 @@ export default function Header() {
               ))}
               <Separator />
               <DropdownMenuItem>
-                <Link href="/signup" className="w-full text-center">
+                <Link href="/signup" className="w-full text-center ">
                   <Button className="w-full">Sign Up</Button>
                 </Link>
               </DropdownMenuItem>

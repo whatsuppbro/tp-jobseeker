@@ -50,7 +50,7 @@ export default function SearchFilter({
           placeholder="Enter keywords..."
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          className="w-full bg-white/65 flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground"
+          className="w-full bg-white flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground"
         />
       </div>
 
@@ -59,7 +59,7 @@ export default function SearchFilter({
           Filter by Category
         </Label>
         <Select value={category} onValueChange={(value) => setCategory(value)}>
-          <SelectTrigger className="w-full bg-white/65 flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground">
+          <SelectTrigger className="w-full bg-white flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground">
             <SelectValue placeholder="Select a category..." />
           </SelectTrigger>
           <SelectContent>
@@ -85,7 +85,10 @@ export default function SearchFilter({
       </div>
 
       <div className="flex items-end">
-        <Button onClick={handleSearch} className="mt-6">
+        <Button
+          onClick={handleSearch}
+          className="mt-6 w-full md:w-auto cursor-pointer"
+        >
           Search
         </Button>
       </div>

@@ -38,7 +38,7 @@ export default function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="bg-white/65 font-normal flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background text-muted-foreground hover:text-muted-foreground"
+          className="bg-white font-normal flex w-full items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background text-muted-foreground hover:text-muted-foreground"
         >
           {value ? value : placeholder || "Select an option..."}
         </Button>

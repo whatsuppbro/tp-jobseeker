@@ -7,6 +7,10 @@
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+body {
+    background-color: rgb(245, 244, 244);
+}
+
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);

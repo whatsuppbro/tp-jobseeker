@@ -28,9 +28,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${ibm_mono} ${open_sans} antialiased`}>
-        <Header />
-        <Providers>{children}</Providers>
-        <Footer />
+        <div className="flex flex-col min-h-screen justify-between">
+          <Header />
+          <Providers>{children}</Providers>
+          <Footer />
+        </div>
       </body>
     </html>
   );
