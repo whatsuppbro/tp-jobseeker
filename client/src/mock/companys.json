@@ -1,0 +1,9 @@
+[
+  {
+    "company_id": 1,
+    "user_id": 2,
+    "company_name": "TechCorp",
+    "company_website": "https://techcorp.com",
+    "contact_email": "contact@techcorp.com"
+  }
+]

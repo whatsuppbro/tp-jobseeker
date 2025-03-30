@@ -1,0 +1,11 @@
+[
+  {
+    "education_id": 1,
+    "seeker_id": 1,
+    "institution_name": "University of California",
+    "degree": "Bachelor of Science",
+    "field_of_study": "Computer Science",
+    "start_year": 2015,
+    "end_year": 2019
+  }
+]

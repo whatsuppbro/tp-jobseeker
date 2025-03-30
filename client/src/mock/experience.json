@@ -1,0 +1,20 @@
+[
+  {
+    "experience_id": 1,
+    "seeker_id": 1,
+    "company_name": "CodeWorks Inc.",
+    "position": "Junior Developer",
+    "start_date": "2019-06-01",
+    "end_date": "2021-08-31",
+    "description": "Developed web applications using JavaScript and React."
+  },
+  {
+    "experience_id": 2,
+    "seeker_id": 1,
+    "company_name": "DataSoft LLC",
+    "position": "Data Analyst",
+    "start_date": "2021-09-01",
+    "end_date": "2023-01-15",
+    "description": "Analyzed large datasets and created visualizations."
+  }
+]

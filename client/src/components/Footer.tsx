@@ -17,8 +17,10 @@ export default function Footer() {
           </div>
 
           <nav className="flex flex-col md:flex-row gap-4 text-sm">
-            {footList.map((footItem) => (
-              <Link href={footItem.href}>{footItem.name}</Link>
+            {footList.map((footItem, i) => (
+              <Link key={i} href={footItem.href}>
+                {footItem.name}
+              </Link>
             ))}
           </nav>
 

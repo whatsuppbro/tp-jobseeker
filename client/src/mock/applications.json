@@ -1,0 +1,16 @@
+[
+  {
+    "application_id": 1,
+    "job_id": 1,
+    "seeker_id": 1,
+    "applied_at": "2023-02-10T11:20:00Z",
+    "status": "pending"
+  },
+  {
+    "application_id": 2,
+    "job_id": 2,
+    "seeker_id": 1,
+    "applied_at": "2023-02-12T16:45:00Z",
+    "status": "accepted"
+  }
+]

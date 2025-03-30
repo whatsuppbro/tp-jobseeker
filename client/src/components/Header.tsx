@@ -22,8 +22,8 @@ export default function Header() {
 
         <div className="hidden md:flex items-center space-x-4">
           <ul className="flex space-x-4">
-            {navList.map((navItem) => (
-              <li key={navItem.name}>
+            {navList.map((navItem, i) => (
+              <li key={i}>
                 <Link href={navItem.href}>
                   <Button variant="ghost">{navItem.name}</Button>
                 </Link>
@@ -44,8 +44,8 @@ export default function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {navList.map((navItem) => (
-                <DropdownMenuItem key={navItem.name}>
+              {navList.map((navItem, i) => (
+                <DropdownMenuItem key={i}>
                   <Link href={navItem.href} className="w-full">
                     {navItem.name}
                   </Link>
