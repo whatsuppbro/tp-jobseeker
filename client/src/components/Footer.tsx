@@ -39,7 +39,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 text-center text-xs text-muted-foreground">
-          Made with ❤️ by Nathee & Punnatat
+          Made with ❤️ by Natee & Punnavut
         </div>
       </div>
     </footer>

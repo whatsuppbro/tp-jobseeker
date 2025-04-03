@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,9 +9,47 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { navList } from "@/data/navList";
-import { AlignJustify } from "lucide-react";
+import { AlignJustify, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  const checkAuth = () => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+      setIsLoggedIn(true);
+    } else {
+      setUser(null);
+      setIsLoggedIn(false);
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUser(null);
+    window.dispatchEvent(new Event("storage"));
+    router.push("/");
+  };
+
   return (
     <nav className="bg-background border-b">
       <div className="container flex items-center justify-between h-16">
@@ -33,9 +72,54 @@ export default function Header() {
             ))}
           </ul>
 
-          <Link href="/signup">
-            <Button className="cursor-pointer">Sign Up</Button>
-          </Link>
+          {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {user?.email}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  Setting
+                </DropdownMenuItem>
+
+                {user?.role === "seeker" && (
+                  <DropdownMenuItem onClick={() => router.push("/saved-jobs")}>
+                    Saved Jobs
+                  </DropdownMenuItem>
+                )}
+                {user?.role === "seeker" && (
+                  <DropdownMenuItem
+                    onClick={() => router.push("/applied-jobs")}
+                  >
+                    Applied Jobs
+                  </DropdownMenuItem>
+                )}
+                {user?.role === "company" && (
+                  <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                    Dashboard
+                  </DropdownMenuItem>
+                )}
+                <Separator />
+                <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link href="/signin">
+                <Button variant="outline" className="cursor-pointer">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="cursor-pointer">Sign Up</Button>
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="md:hidden">
@@ -54,11 +138,52 @@ export default function Header() {
                 </DropdownMenuItem>
               ))}
               <Separator />
-              <DropdownMenuItem>
-                <Link href="/signup" className="w-full text-center ">
-                  <Button className="w-full">Sign Up</Button>
-                </Link>
-              </DropdownMenuItem>
+              {isLoggedIn ? (
+                <>
+                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                    Setting
+                  </DropdownMenuItem>
+                  {user?.role === "seeker" && (
+                    <DropdownMenuItem
+                      onClick={() => router.push("/saved-jobs")}
+                    >
+                      Saved Jobs
+                    </DropdownMenuItem>
+                  )}
+                  {user?.role === "seeker" && (
+                    <DropdownMenuItem
+                      onClick={() => router.push("/applied-jobs")}
+                    >
+                      Applied Jobs
+                    </DropdownMenuItem>
+                  )}
+                  {user?.role === "company" && (
+                    <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                      Dashboard
+                    </DropdownMenuItem>
+                  )}
+                  <Separator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem>
+                    <Link href="/login" className="w-full">
+                      Login
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/signup" className="w-full">
+                      Sign Up
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
