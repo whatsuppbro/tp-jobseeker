@@ -1,6 +1,7 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
 import { userController } from "@/controllers/user";
+import cors from "@elysiajs/cors";
 
 const app = new Elysia()
   .use(
@@ -23,3 +24,10 @@ const app = new Elysia()
   .get("/", ({ path }) => path)
   .use(userController)
   .listen(8000);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);

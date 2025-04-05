@@ -2,10 +2,13 @@ import Elysia from "elysia";
 // import { UserModel } from "@/db/models/user";
 import {
   getUsers,
-  getUsersById,
-  createUser,
+  getUserById,
+  getUserByEmail,
+  // createUser,
   // deleteUser,
 } from "@/services/user";
+import { UserModel, userLoginModel } from "@/db/models/user";
+import { t } from "elysia";
 
 const controller = "user";
 
@@ -13,20 +16,53 @@ export const userController = new Elysia({
   detail: {
     tags: [controller],
   },
-})
-  .get(`/${controller}`, async () => {
-    const users = await getUsers();
-    return users;
-  })
-  .get(`/${controller}/:id`, async ({ params }) => {
-    const user = await getUsersById(params.id);
-    return user;
-  })
+}).group(controller, (app) =>
+  app
+    .get(`/${controller}`, async () => {
+      const users = await getUsers();
+      return users;
+    })
+    .get(`/${controller}/:id`, async ({ params }) => {
+      const user = await getUserById(params.id);
+      return user;
+    })
+    .post(
+      "/login",
+      async ({ body }) => {
+        const { email, password } = body;
+        const user = await getUserByEmail(email);
 
-  .post(`/${controller}`, async ({ body }) => {
-    const user = await createUser(body as any);
-    return user;
-  });
+        if (!user || user.password !== password) {
+          return { success: false, message: "Invalid email or password" };
+        }
+
+        return {
+          success: true,
+          message: "Login successful",
+          user: {
+            id: user.id,
+            email,
+            role: user.role,
+          },
+        };
+      },
+      {
+        body: t.Object({
+          email: t.String(),
+          password: t.String(),
+        }),
+        detail: {
+          summary: "User login",
+          description: "Authenticate a user with email and password.",
+        },
+      }
+    )
+);
+
+// .post(`/${controller}`, async ({ body }) => {
+//   const user = await createUser(body as any);
+//   return user;
+// });
 
 // .put(
 //   `/${controller}/:id`,

@@ -13,7 +13,7 @@ export const getUsers = async () => {
   return users;
 };
 
-export const getUsersById = async (id: string) => {
+export const getUserById = async (id: string) => {
   const user = await db.query.user.findFirst({
     where: eq(table.user.id, id),
     columns: {
@@ -27,22 +27,18 @@ export const getUsersById = async (id: string) => {
   return user;
 };
 
-export const createUser = async (userData: { name: string; email: string }) => {
-  try {
-    const [createdUser] = await db
-      .insert(table.user)
-      .values(userData as any)
-      .returning();
+export const getUserByEmail = async (email: string) => {
+  const user = await db.query.user.findFirst({
+    where: eq(table.user.email, email),
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
+  });
 
-    if (!createdUser) {
-      throw new Error("Failed to create user");
-    }
+  if (!user) throw new Error("User not found");
 
-    return createdUser;
-  } catch (error) {
-    console.error("Error creating user:", error);
-    throw error;
-  }
+  return user;
 };
 
 // export const createUser = async (body: UserType) => {

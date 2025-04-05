@@ -45,42 +45,41 @@ export default function Login() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    try {
-      // const requestOptions = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(values),
-      // };
-      // const response = await fetch("/api/auth/login", requestOptions);
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch user data");
-      // }
-      // const users = await response.json();
-      const users = userList;
 
-      const user = users.find(
-        (u: any) => u.email === values.email && u.password === values.password
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
       );
 
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
+      const data = await response.json();
 
-        window.dispatchEvent(new Event("storage"));
+      if (!data.success) {
+        throw new Error(data.message || "Invalid email or password");
+      }
 
-        toast.success("Login successful!");
+      const { id, email, role } = data.user;
 
-        if (user.role === "company") {
-          router.push("/dashboard");
-        } else {
-          router.push("/profile");
-        }
+      localStorage.setItem("user", JSON.stringify({ id, email, role }));
+
+      window.dispatchEvent(new Event("storage"));
+
+      toast.success("Login successful!");
+
+      if (role === "company") {
+        router.push("/dashboard");
       } else {
-        toast.error("Invalid email or password");
+        router.push("/profile");
       }
     } catch (error) {
-      console.error("Login error", error);
+      console.error("Login error:", error);
+
       toast.error("Failed to login. Please try again.");
     } finally {
       setIsLoading(false);
