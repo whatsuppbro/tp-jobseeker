@@ -85,37 +85,6 @@ export default function Login() {
       setIsLoading(false);
     }
   }
-  //---------------------------------------------------------------
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await fetch("/api/auth/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(values),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(await response.text());
-  //     }
-
-  //     const data = await response.json();
-  //     toast.success("Login successful!");
-
-  //     if (data.user.role === "company") {
-  //       router.push("/dashboard");
-  //     } else {
-  //       router.push("/profile");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error", error);
-  //     toast.error("Invalid email or password");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
 
   return (
     <Card className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">

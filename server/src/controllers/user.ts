@@ -18,11 +18,11 @@ export const userController = new Elysia({
   },
 }).group(controller, (app) =>
   app
-    .get(`/${controller}`, async () => {
+    .get(`/`, async () => {
       const users = await getUsers();
       return users;
     })
-    .get(`/${controller}/:id`, async ({ params }) => {
+    .get(`/:id`, async ({ params }) => {
       const user = await getUserById(params.id);
       return user;
     })
@@ -51,10 +51,6 @@ export const userController = new Elysia({
           email: t.String(),
           password: t.String(),
         }),
-        detail: {
-          summary: "User login",
-          description: "Authenticate a user with email and password.",
-        },
       }
     )
 );
