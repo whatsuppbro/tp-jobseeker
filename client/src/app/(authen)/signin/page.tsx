@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 import {
   Form,
   FormControl,
@@ -19,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import mockUser from "@/mock/user.json";
-import { request } from "http";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -41,8 +38,6 @@ export default function Login() {
     },
   });
 
-  const userList = mockUser as any[];
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
 
@@ -60,11 +55,11 @@ export default function Login() {
 
       const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.message || "Invalid email or password");
+      if (!data.data.success) {
+        throw new Error(data.data.message || "Invalid email or password");
       }
 
-      const { id, email, role } = data.user;
+      const { id, email, role } = data.data.user;
 
       localStorage.setItem("user", JSON.stringify({ id, email, role }));
 
@@ -79,8 +74,11 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Login error:", error);
-
-      toast.error("Failed to login. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to login. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }

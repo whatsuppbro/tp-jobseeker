@@ -11,6 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormDescription,
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -21,15 +22,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
-    fname: z
+    firstname: z
       .string()
       .min(2, { message: "First name must be at least 2 characters long" }),
-    lname: z
+    lastname: z
       .string()
       .min(2, { message: "Last name must be at least 2 characters long" }),
     email: z.string().email({ message: "Invalid email address" }),
@@ -38,6 +47,7 @@ const formSchema = z
       .min(6, { message: "Password must be at least 6 characters long" })
       .regex(/[a-zA-Z0-9]/, { message: "Password must be alphanumeric" }),
     confirmPassword: z.string(),
+    role: z.string().min(1, { message: "Role is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -45,29 +55,42 @@ const formSchema = z
   });
 
 export default function Register() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fname: "",
-      lname: "",
+      firstname: "",
+      lastname: "",
       email: "",
       password: "",
+      role: "",
       confirmPassword: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values, "Form values");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+      const data = await response.json();
+      if (!data.data.success) {
+        router.push("/signin");
+      }
+
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
         </pre>
       );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
+    } catch (error) {}
   }
 
   return (
@@ -83,12 +106,12 @@ export default function Register() {
             <div className="grid gap-4">
               <FormField<z.infer<typeof formSchema>>
                 control={form.control}
-                name="fname"
+                name="firstname"
                 render={({ field }) => (
                   <FormItem className="grid gap-2">
                     <FormLabel htmlFor="name">First Name</FormLabel>
                     <FormControl>
-                      <Input id="fname" placeholder="John" {...field} />
+                      <Input id="firstname" placeholder="John" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -97,12 +120,12 @@ export default function Register() {
 
               <FormField<z.infer<typeof formSchema>>
                 control={form.control}
-                name="lname"
+                name="lastname"
                 render={({ field }) => (
                   <FormItem className="grid gap-2">
                     <FormLabel htmlFor="name">Last Name</FormLabel>
                     <FormControl>
-                      <Input id="lname" placeholder="Doe" {...field} />
+                      <Input id="lastname" placeholder="Doe" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -124,6 +147,31 @@ export default function Register() {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="grid gap-2">
+                    <FormLabel>Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="w-full">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Please select your role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="seeker">Seeker</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

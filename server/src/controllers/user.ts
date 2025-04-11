@@ -4,11 +4,12 @@ import {
   getUsers,
   getUserById,
   getUserByEmail,
-  // createUser,
-  // deleteUser,
+  createUser,
+  deleteUser,
 } from "@/services/user";
-import { UserModel, userLoginModel } from "@/db/models/user";
+import { UserModel } from "@/db/models/user";
 import { t } from "elysia";
+import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
 
 const controller = "user";
 
@@ -19,58 +20,95 @@ export const userController = new Elysia({
 }).group(controller, (app) =>
   app
     .get(`/`, async () => {
-      const users = await getUsers();
-      return users;
+      try {
+        const users = await getUsers();
+        return SuccessHandler(users);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
     })
+
     .get(`/:id`, async ({ params }) => {
-      const user = await getUserById(params.id);
-      return user;
+      try {
+        const user = await getUserById(params.id);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        return SuccessHandler(user);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
     })
+
     .post(
       "/login",
       async ({ body }) => {
-        const { email, password } = body;
-        const user = await getUserByEmail(email);
+        try {
+          const { email, password } = body;
+          const user = await getUserByEmail(email);
 
-        if (!user || user.password !== password) {
-          return { success: false, message: "Invalid email or password" };
+          if (!user || !(await Bun.password.verify(password, user.password))) {
+            throw new Error("Invalid email or password");
+          }
+
+          return SuccessHandler({
+            success: true,
+            message: "Login successful",
+            user: {
+              id: user.id,
+              email,
+              role: user.role,
+            },
+          });
+        } catch (error) {
+          return ErrorHandler(error);
         }
-
-        return {
-          success: true,
-          message: "Login successful",
-          user: {
-            id: user.id,
-            email,
-            role: user.role,
-          },
-        };
       },
       {
         body: t.Object({
           email: t.String(),
-          password: t.String(),
+          password: t.String({ minLength: 6 }),
+        }),
+      }
+    )
+
+    .post(
+      "/register",
+      async ({ body }) => {
+        try {
+          const hashedPassword = await Bun.password.hash(body.password, {
+            algorithm: "bcrypt",
+            cost: 4,
+          });
+
+          const user = await createUser({
+            ...body,
+            password: hashedPassword,
+          });
+
+          return SuccessHandler(user);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: UserModel,
+      }
+    )
+    .delete(
+      "/:id",
+      async ({ params }) => {
+        try {
+          const user = await deleteUser(params.id);
+          return SuccessHandler(user);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
         }),
       }
     )
 );
-
-// .post(`/${controller}`, async ({ body }) => {
-//   const user = await createUser(body as any);
-//   return user;
-// });
-
-// .put(
-//   `/${controller}/:id`,
-//   async ({ params, body }) => {
-//     const user = await updateUser(params.id, body);
-//     return user;
-//   },
-//   {
-//     body: UserModel,
-//   }
-// )
-// .delete(`/${controller}/:id`, async ({ params }) => {
-//   const result = await deleteUser(params.id);
-//   return result;
-// });

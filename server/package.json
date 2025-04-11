@@ -4,7 +4,6 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "db:push": "bun drizzle-kit push",
-    "db:seed": "bun run src/db/seed.ts",
     "db:studio": "bun drizzle-kit studio"
   },
   "dependencies": {
