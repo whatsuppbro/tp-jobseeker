@@ -1,0 +1,53 @@
+import Elysia from "elysia";
+import {
+  getSeekers,
+  getSeekerById,
+  getSeekerByUserId,
+  createSeeker,
+  updateSeeker,
+  deleteSeeker,
+} from "@/services/seekers";
+import { SeekerModel } from "@/db/models/seekers";
+import { t } from "elysia";
+import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
+
+const controller = "seeker";
+
+export const seekerController = new Elysia({
+  detail: {
+    tags: [controller],
+  },
+}).group(controller, (app) =>
+  app
+    .get(`/`, async () => {
+      try {
+        const seekers = await getSeekers();
+        return SuccessHandler(seekers);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+
+    .get(`/:id`, async ({ params }) => {
+      try {
+        const seeker = await getSeekerById(params.id);
+        if (!seeker) {
+          throw new Error("Seeker not found");
+        }
+        return SuccessHandler(seeker);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+    .get(`/user/:id`, async ({ params }) => {
+      try {
+        const seeker = await getSeekerByUserId(params.id);
+        if (!seeker) {
+          throw new Error("Seeker not found");
+        }
+        return SuccessHandler(seeker);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+);

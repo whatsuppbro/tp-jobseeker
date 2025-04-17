@@ -87,7 +87,11 @@ export default function Register() {
 
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+          <span className="text-sm text-slate-50">
+            {data.data.message || "Registration successful!"}
+          </span>
+          <br />
+          <span className="text-xs text-slate-400">{data.data.user.email}</span>
         </pre>
       );
     } catch (error) {}

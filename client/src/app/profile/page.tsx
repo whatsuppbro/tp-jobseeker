@@ -2,19 +2,22 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 interface User {
   id: string;
   email: string;
-  firstname: string;
-  lastname: string;
+  firstname?: string;
+  lastname?: string;
   role: "seeker" | "company";
   skills?: string[];
   experience?: string;
-  companyName?: string;
-  industry?: string;
-  location?: string;
+  phonenumber?: string;
+  address?: string;
+  city?: string;
+  resume?: string;
+  company_name?: string;
+  position?: string;
+  description?: string;
 }
 
 export default function Profile() {
@@ -25,21 +28,44 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userFromStorage = localStorage.getItem("user");
-        if (!userFromStorage) {
-          setIsLoading(false);
-          return;
-        }
-        const userData = JSON.parse(userFromStorage);
-        const userId = userData.id;
+        const userData = localStorage.getItem("user");
+        if (!userData) return;
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`
+        const parsedUser = JSON.parse(userData);
+        const userId = parsedUser.id;
+
+        const [userResponse, seekerResponse, experienceRes] = await Promise.all(
+          [
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/seeker/user/${userId}`),
+            fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/experience/user/${userId}`
+            ),
+          ]
         );
 
-        if (!response.ok) throw new Error("Failed to fetch user");
-        const responseData = await response.json();
-        const completeUserData: User = responseData.data;
+        if (!userResponse.ok || !seekerResponse.ok)
+          throw new Error("Failed to fetch data");
+
+        const [userDataResponse, seekerDataResponse, experienceData] =
+          await Promise.all([
+            userResponse.json(),
+            seekerResponse.json(),
+            experienceRes.json(),
+          ]);
+
+        const completeUserData: User = {
+          ...userDataResponse.data,
+          phonenumber: seekerDataResponse.data.phonenumber || null,
+          address: seekerDataResponse.data.address || null,
+          city: seekerDataResponse.data.city || null,
+          resume: seekerDataResponse.data.resume || null,
+          company_name: experienceData.data.company_name || null,
+          position: experienceData.data.position || null,
+          description: experienceData.data.description || null,
+        };
+
+        setUser(completeUserData);
 
         setUser(completeUserData);
       } catch (error) {
@@ -53,9 +79,7 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
-    if (user?.role === "company") {
-      router.push("/dashboard");
-    }
+    if (user?.role === "company") router.push("/dashboard");
   }, [user, router]);
 
   if (isLoading) {
@@ -65,33 +89,23 @@ export default function Profile() {
       </div>
     );
   }
-  const displayName =
-    user?.firstname || user?.lastname
-      ? `${user.firstname || ""} ${user.lastname || ""}`.trim()
-      : "Guest";
 
-  if (!user || user.role === "company") {
+  if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-6 bg-gray-50">
-        <h1 className="text-4xl font-extrabold text-center bg-clip-text ">
+        <h1 className="text-4xl font-extrabold text-center">
           Welcome to JobTP
         </h1>
         <p className="max-w-md text-center text-gray-600">
-          Sign in to view or create your professional profile and start your job
-          search or hiring journey.
+          Sign in to view or create your professional profile.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            onClick={() => router.push("/signin")}
-            className="w-full sm:w-40 transition-all hover:bg-blue-600"
-            size="lg"
-          >
+          <Button onClick={() => router.push("/signin")} size="lg">
             Sign In
           </Button>
           <Button
             onClick={() => router.push("/signup")}
             variant="outline"
-            className="w-full sm:w-40 hover:bg-gray-100 transition-all"
             size="lg"
           >
             Sign Up
@@ -101,153 +115,142 @@ export default function Profile() {
     );
   }
 
+  const displayName =
+    `${user.firstname || ""} ${user.lastname || ""}`.trim() || "Guest";
+
   return (
-    <div className="container px-4 mx-auto md:px-6 lg:px-8 flex flex-col items-center py-12">
-      <div className="w-full max-w-6xl space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">
-              Welcome back, <span className="capitalize">{displayName}</span>!
-            </h1>
-            <p className="text-gray-600">
-              Manage your professional profile and applications
-            </p>
-          </div>
+    <div className="container mx-auto px-4 py-12">
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">
+            Welcome back, <span className="capitalize">{displayName}</span>!
+          </h1>
           <Button
-            variant="outline"
             onClick={() => router.push("/profile/edit")}
-            className="px-8 py-2 hover:bg-gray-50 transition-all border-gray-300"
+            variant="outline"
           >
             Edit Profile
           </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                Personal Information
-              </h2>
-              <div className="space-y-6">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">
-                    Full Name
-                  </span>
-                  <span className="text-lg text-gray-900 capitalize">
-                    {displayName || "Not provided"}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">
-                    Email Address
-                  </span>
-                  <span className="text-lg text-gray-900 break-all">
-                    {user.email}
-                  </span>
-                </div>
-              </div>
-            </div>
+          <div className="lg:col-span-2 space-y-6">
+            {/* Personal Information Section */}
+            <ProfileSection title="Personal Information">
+              <InfoRow
+                label="Full Name"
+                value={displayName || "Not provided"}
+              />
+              <InfoRow label="Email Address" value={user.email} />
+              <InfoRow
+                label="Phone Number"
+                value={user.phonenumber || "Not provided"}
+              />
+              <InfoRow label="Address" value={user.address || "Not provided"} />
+              <InfoRow label="City" value={user.city || "Not provided"} />
+              <InfoRow
+                label="Resume"
+                value={
+                  user.resume ? (
+                    <a
+                      href={user.resume}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Resume
+                    </a>
+                  ) : (
+                    "Not provided"
+                  )
+                }
+              />
+            </ProfileSection>
 
-            <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
-                Skills & Experience
-              </h2>
-              <div className="space-y-6">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">
-                    Skills
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {user.skills?.length ? (
-                      user.skills.map((skill) => (
-                        <span
-                          key={skill}
-                          className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                        >
+            {/* Skills & Experience Section */}
+            <ProfileSection title="Skills & Experience">
+              <InfoRow
+                label="Skills"
+                value={
+                  user.skills?.length ? (
+                    <div className="flex flex-wrap gap-2">
+                      {user.skills.map((skill) => (
+                        <span key={skill} className="badge">
                           {skill}
                         </span>
-                      ))
-                    ) : (
-                      <span className="text-gray-500">Not specified</span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-500">
-                    Experience
-                  </span>
-                  <p className="text-gray-700 leading-relaxed">
-                    {user.experience || "No experience added yet"}
-                  </p>
-                </div>
-              </div>
-            </div>
+                      ))}
+                    </div>
+                  ) : (
+                    "Not specified"
+                  )
+                }
+              />
+              <InfoRow
+                label="Experience"
+                value={user.company_name || "No experience added yet"}
+              />
+              <InfoRow
+                label="Position"
+                value={user.position || "No position added yet"}
+              />
+              <InfoRow
+                label="Description"
+                value={user.description || "No description added yet"}
+              />
+            </ProfileSection>
           </div>
 
-          <div className="lg:col-span-1 space-y-8">
-            <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Applications
-                </h2>
-                <span className="text-blue-600 text-sm font-medium">
-                  0 Active
-                </span>
-              </div>
-
-              <div className="space-y-6">
-                <div className="text-center p-8 bg-gray-50 rounded-lg">
-                  <p className="text-gray-500 mb-4">
-                    You haven't applied to any jobs yet
-                  </p>
-                  <Button
-                    variant="default"
-                    className="w-full "
-                    onClick={() => router.push("/jobs")}
-                  >
-                    Browse Jobs
-                  </Button>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Quick Actions</h3>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2 text-gray-700"
-                    onClick={() => router.push("/jobs?filter=recent")}
-                  >
-                    <span>🔥</span> View New Postings
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2 text-gray-700"
-                    onClick={() => router.push("/jobs?filter=remote")}
-                  >
-                    <span>🏠</span> Remote Opportunities
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Profile Strength
-              </h2>
-              <div className="space-y-4">
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 rounded-full h-2 transition-all"
-                    style={{ width: `${calculateProfileCompleteness(user)}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600">
-                  Complete your profile to increase visibility to employers
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <ProfileSection title="Applications">
+              <div className="text-center p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-500 mb-4">
+                  You haven't applied to any jobs yet.
                 </p>
+                <Button onClick={() => router.push("/jobs")}>
+                  Browse Jobs
+                </Button>
               </div>
-            </div>
+            </ProfileSection>
+
+            <ProfileSection title="Profile Strength">
+              <div className="w-full bg-gray-100 rounded-full h-2">
+                <div
+                  className="bg-blue-600 rounded-full h-2"
+                  style={{ width: `${calculateProfileCompleteness(user)}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">
+                Complete your profile to increase visibility to employers.
+              </p>
+            </ProfileSection>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProfileSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-sm font-medium text-gray-500">{label}</span>
+      <span className="text-lg text-gray-900">{value}</span>
     </div>
   );
 }

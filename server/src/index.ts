@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import { userController } from "@/controllers/user";
+import controllers from "./controllers";
 import cors from "@elysiajs/cors";
 
 const app = new Elysia()
@@ -22,7 +22,7 @@ const app = new Elysia()
     })
   )
   .get("/", ({ path }) => path)
-  .use(userController)
+  .use(controllers)
   .listen(8000);
 
 app.use(

@@ -1,5 +1,4 @@
 import Elysia from "elysia";
-// import { UserModel } from "@/db/models/user";
 import {
   getUsers,
   getUserById,
