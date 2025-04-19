@@ -3,6 +3,7 @@ import {
   getUsers,
   getUserById,
   getUserByEmail,
+  updateUser,
   createUser,
   deleteUser,
 } from "@/services/user";
@@ -38,6 +39,24 @@ export const userController = new Elysia({
         return ErrorHandler(error);
       }
     })
+
+    .put(
+      "/:id",
+      async ({ params, body }) => {
+        try {
+          const user = await updateUser(params.id, body);
+          return SuccessHandler(user);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: UserModel,
+      }
+    )
 
     .post(
       "/login",

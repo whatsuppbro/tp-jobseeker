@@ -6,7 +6,10 @@ import { t } from "elysia";
 
 export const getCompanies = async () => {
   const companies = await db.query.company.findMany({
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   return companies;
@@ -15,7 +18,10 @@ export const getCompanies = async () => {
 export const getCompanyById = async (id: string) => {
   const company = await db.query.company.findFirst({
     where: eq(table.company.id, id),
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!company) throw new Error("Company not found");
@@ -26,7 +32,10 @@ export const getCompanyById = async (id: string) => {
 export const getCompanyByUserId = async (userId: string) => {
   const company = await db.query.company.findFirst({
     where: eq(table.company.user_id, userId),
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!company) throw new Error("Company not found");

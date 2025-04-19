@@ -3,6 +3,7 @@ import {
   getExperience,
   getExperienceById,
   getExperienceByUserId,
+  getExperienceWithSkill,
   createExperience,
   updateExperience,
   deleteExperience,
@@ -10,6 +11,7 @@ import {
 import { ExperienceModel } from "@/db/models/experience";
 import { t } from "elysia";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
+import { getSkillByExperience } from "../services/experience/skill";
 
 const controller = "experience";
 
@@ -21,7 +23,7 @@ export const experienceController = new Elysia({
   app
     .get(`/`, async () => {
       try {
-        const experience = await getExperience();
+        const experience = await getExperienceWithSkill();
         return SuccessHandler(experience);
       } catch (error) {
         return ErrorHandler(error);
@@ -59,6 +61,19 @@ export const experienceController = new Elysia({
           throw new Error("Experience not found");
         }
         return SuccessHandler(experience);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+
+    .get(`/skill/:id`, async ({ params }) => {
+      try {
+        const experience = await getExperienceById(params.id);
+        if (!experience) {
+          throw new Error("Experience not found");
+        }
+        const skills = await getSkillByExperience(params.id);
+        return SuccessHandler(skills);
       } catch (error) {
         return ErrorHandler(error);
       }

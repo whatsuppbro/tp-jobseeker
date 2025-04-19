@@ -9,12 +9,19 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  skills?: string[];
-  experience?: string;
-  phonenumber?: string;
-  address?: string;
-  city?: string;
-  resume?: string;
+  skill?: string[];
+  experience?: {
+    company_name?: string;
+    position?: string;
+    description?: string;
+    skill?: { name: string }[];
+  };
+  seeker: {
+    phonenumber?: string;
+    address?: string;
+    city?: string;
+    resume_url?: string;
+  };
   company_name?: string;
   position?: string;
   description?: string;
@@ -34,38 +41,17 @@ export default function Profile() {
         const parsedUser = JSON.parse(userData);
         const userId = parsedUser.id;
 
-        const [userResponse, seekerResponse, experienceRes] = await Promise.all(
-          [
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`),
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/seeker/user/${userId}`),
-            fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/experience/user/${userId}`
-            ),
-          ]
-        );
+        const [userResponse] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`),
+        ]);
 
-        if (!userResponse.ok || !seekerResponse.ok)
-          throw new Error("Failed to fetch data");
+        if (!userResponse.ok) throw new Error("Failed to fetch data");
 
-        const [userDataResponse, seekerDataResponse, experienceData] =
-          await Promise.all([
-            userResponse.json(),
-            seekerResponse.json(),
-            experienceRes.json(),
-          ]);
+        const [userDataResponse] = await Promise.all([userResponse.json()]);
 
         const completeUserData: User = {
           ...userDataResponse.data,
-          phonenumber: seekerDataResponse.data.phonenumber || null,
-          address: seekerDataResponse.data.address || null,
-          city: seekerDataResponse.data.city || null,
-          resume: seekerDataResponse.data.resume || null,
-          company_name: experienceData.data.company_name || null,
-          position: experienceData.data.position || null,
-          description: experienceData.data.description || null,
         };
-
-        setUser(completeUserData);
 
         setUser(completeUserData);
       } catch (error) {
@@ -135,7 +121,6 @@ export default function Profile() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {/* Personal Information Section */}
             <ProfileSection title="Personal Information">
               <InfoRow
                 label="Full Name"
@@ -144,16 +129,22 @@ export default function Profile() {
               <InfoRow label="Email Address" value={user.email} />
               <InfoRow
                 label="Phone Number"
-                value={user.phonenumber || "Not provided"}
+                value={user.seeker.phonenumber || "Not provided"}
               />
-              <InfoRow label="Address" value={user.address || "Not provided"} />
-              <InfoRow label="City" value={user.city || "Not provided"} />
+              <InfoRow
+                label="Address"
+                value={user.seeker.address || "Not provided"}
+              />
+              <InfoRow
+                label="City"
+                value={user.seeker.city || "Not provided"}
+              />
               <InfoRow
                 label="Resume"
                 value={
-                  user.resume ? (
+                  user.seeker.resume_url ? (
                     <a
-                      href={user.resume}
+                      href={user.seeker.resume_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -167,16 +158,15 @@ export default function Profile() {
               />
             </ProfileSection>
 
-            {/* Skills & Experience Section */}
             <ProfileSection title="Skills & Experience">
               <InfoRow
                 label="Skills"
                 value={
-                  user.skills?.length ? (
+                  user.experience?.skill?.length ? (
                     <div className="flex flex-wrap gap-2">
-                      {user.skills.map((skill) => (
-                        <span key={skill} className="badge">
-                          {skill}
+                      {user.experience.skill.map((skill) => (
+                        <span key={skill.name} className="badge">
+                          {skill.name}
                         </span>
                       ))}
                     </div>
@@ -187,20 +177,23 @@ export default function Profile() {
               />
               <InfoRow
                 label="Experience"
-                value={user.company_name || "No experience added yet"}
+                value={
+                  user.experience?.company_name || "No experience added yet"
+                }
               />
               <InfoRow
                 label="Position"
-                value={user.position || "No position added yet"}
+                value={user.experience?.position || "No position added yet"}
               />
               <InfoRow
                 label="Description"
-                value={user.description || "No description added yet"}
+                value={
+                  user.experience?.description || "No description added yet"
+                }
               />
             </ProfileSection>
           </div>
 
-          {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             <ProfileSection title="Applications">
               <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -258,7 +251,11 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
-  if (user.skills?.length) completeFields++;
-  if (user.experience) completeFields++;
-  return Math.round((completeFields / 4) * 100);
+  if (user.experience?.skill?.length) completeFields++;
+  if (user.experience?.company_name) completeFields++;
+  if (user.seeker.phonenumber) completeFields++;
+  if (user.seeker.address) completeFields++;
+  if (user.seeker.city) completeFields++;
+  if (user.seeker.resume_url) completeFields++;
+  return Math.round((completeFields / 8) * 100);
 }

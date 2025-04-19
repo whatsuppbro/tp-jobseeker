@@ -1,4 +1,6 @@
 import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { seeker, experience } from ".";
 
 export const user = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -13,3 +15,14 @@ export const user = pgTable("user", {
     .notNull()
     .$onUpdate(() => new Date()),
 });
+
+export const userRelations = relations(user, ({ one, many }) => ({
+  seeker: one(seeker, {
+    fields: [user.id],
+    references: [seeker.user_id],
+  }),
+  experience: one(experience, {
+    fields: [user.id],
+    references: [experience.user_id],
+  }),
+}));

@@ -16,6 +16,11 @@ export const company = pgTable("company", {
   company_address: text("company_address"),
   company_city: text("company_city"),
   company_country: text("company_country"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
 
 export const companyRelations = relations(company, ({ one }) => ({

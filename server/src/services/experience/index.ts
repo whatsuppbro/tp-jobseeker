@@ -5,7 +5,27 @@ import { ExperienceType } from "@/db/models/experience";
 
 export const getExperience = async () => {
   const experience = await db.query.experience.findMany({
-    columns: undefined,
+    with: {
+      skill: true,
+    },
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
+  });
+
+  return experience;
+};
+
+export const getExperienceWithSkill = async () => {
+  const experience = await db.query.experience.findMany({
+    with: {
+      skill: true,
+    },
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   return experience;
@@ -13,8 +33,14 @@ export const getExperience = async () => {
 
 export const getExperienceById = async (id: string) => {
   const experience = await db.query.experience.findFirst({
+    with: {
+      skill: true,
+    },
     where: eq(table.experience.id, id),
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!experience) throw new Error("Experience not found");
@@ -25,7 +51,13 @@ export const getExperienceById = async (id: string) => {
 export const getExperienceByUserId = async (userId: string) => {
   const experience = await db.query.experience.findFirst({
     where: eq(table.experience.user_id, userId),
-    columns: undefined,
+    with: {
+      skill: true,
+    },
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!experience) throw new Error("Experience not found");

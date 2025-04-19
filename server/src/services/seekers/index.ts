@@ -5,7 +5,10 @@ import { SeekerType } from "@/db/models/seekers";
 
 export const getSeekers = async () => {
   const seekers = await db.query.seeker.findMany({
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   return seekers;
@@ -14,7 +17,10 @@ export const getSeekers = async () => {
 export const getSeekerById = async (id: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.id, id),
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!seeker) throw new Error("Seeker not found");
@@ -25,7 +31,10 @@ export const getSeekerById = async (id: string) => {
 export const getSeekerByUserId = async (userId: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.user_id, userId),
-    columns: undefined,
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
   });
 
   if (!seeker) throw new Error("Seeker not found");
