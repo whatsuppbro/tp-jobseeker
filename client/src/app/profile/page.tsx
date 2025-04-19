@@ -9,7 +9,6 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  skill?: string[];
   seeker: {
     phonenumber?: string;
     address?: string;
@@ -193,7 +192,10 @@ export default function Profile() {
                   user.seeker.skills?.length ? (
                     <div className="flex flex-wrap gap-2">
                       {user.seeker.skills.map((skill) => (
-                        <span key={skill.id} className="badge">
+                        <span
+                          key={skill.id}
+                          className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-300 ease-in-out"
+                        >
                           {skill.name}
                         </span>
                       ))}
@@ -235,9 +237,7 @@ export default function Profile() {
                 <p className="text-gray-500 mb-4">
                   You haven't applied to any jobs yet.
                 </p>
-                <Button onClick={() => router.push("/jobs")}>
-                  Browse Jobs
-                </Button>
+                <Button onClick={() => router.push("/job")}>Browse Jobs</Button>
               </div>
             </ProfileSection>
 

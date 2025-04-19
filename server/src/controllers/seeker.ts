@@ -7,6 +7,7 @@ import {
   updateSeeker,
   deleteSeeker,
 } from "@/services/seekers";
+import { getSkillBySeeker } from "@/services/seekers/skill";
 import { SeekerModel } from "@/db/models/seekers";
 import { t } from "elysia";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
@@ -42,6 +43,18 @@ export const seekerController = new Elysia({
     .get(`/user/:id`, async ({ params }) => {
       try {
         const seeker = await getSeekerByUserId(params.id);
+        if (!seeker) {
+          throw new Error("Seeker not found");
+        }
+        return SuccessHandler(seeker);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+
+    .get(`/skill/:id`, async ({ params }) => {
+      try {
+        const seeker = await getSkillBySeeker(params.id);
         if (!seeker) {
           throw new Error("Seeker not found");
         }

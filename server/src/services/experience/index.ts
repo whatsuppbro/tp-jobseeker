@@ -5,9 +5,6 @@ import { ExperienceType } from "@/db/models/experience";
 
 export const getExperience = async () => {
   const experience = await db.query.experience.findMany({
-    with: {
-      skill: true,
-    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -19,9 +16,6 @@ export const getExperience = async () => {
 
 export const getExperienceWithSkill = async () => {
   const experience = await db.query.experience.findMany({
-    with: {
-      skill: true,
-    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -33,9 +27,6 @@ export const getExperienceWithSkill = async () => {
 
 export const getExperienceById = async (id: string) => {
   const experience = await db.query.experience.findFirst({
-    with: {
-      skill: true,
-    },
     where: eq(table.experience.id, id),
     columns: {
       created_at: false,
@@ -50,10 +41,8 @@ export const getExperienceById = async (id: string) => {
 
 export const getExperienceByUserId = async (userId: string) => {
   const experience = await db.query.experience.findFirst({
-    where: eq(table.experience.user_id, userId),
-    with: {
-      skill: true,
-    },
+    where: eq(table.experience.seeker_id, userId),
+
     columns: {
       created_at: false,
       updated_at: false,
@@ -63,12 +52,6 @@ export const getExperienceByUserId = async (userId: string) => {
   if (!experience) throw new Error("Experience not found");
 
   return experience;
-};
-
-export const createExperience = async (body: ExperienceType) => {
-  const newExperience = await db.insert(table.experience).values(body);
-
-  return newExperience;
 };
 
 export const updateExperience = async (
@@ -98,7 +81,7 @@ export const deleteExperience = async (id: string) => {
 export const deleteExperienceByUserId = async (userId: string) => {
   const experience = await db
     .delete(table.experience)
-    .where(eq(table.experience.user_id, userId));
+    .where(eq(table.experience.seeker_id, userId));
 
   if (!experience) throw new Error("Experience not found");
 

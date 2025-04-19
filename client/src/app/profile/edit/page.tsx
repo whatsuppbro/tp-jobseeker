@@ -11,18 +11,20 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  skill?: string[];
-  experience?: {
-    company_name?: string;
-    position?: string;
-    description?: string;
-    skill?: { name: string }[];
-  };
   seeker: {
     phonenumber?: string;
     address?: string;
     city?: string;
     resume_url?: string;
+    experience?: {
+      company_name?: string;
+      position?: string;
+      description?: string;
+    };
+    skills?: {
+      id: string;
+      name: string;
+    }[];
   };
   company_name?: string;
   position?: string;
@@ -58,9 +60,9 @@ export default function EditProfile() {
         };
 
         setUser(completeUserData);
-        if (userDataResponse.data.experience?.skill) {
+        if (userDataResponse.data.seeker?.skills) {
           setSkillsInput(
-            userDataResponse.data.experience.skill
+            userDataResponse.data.seeker.skills
               .map((s: { name: any }) => s.name)
               .join(", ")
           );
@@ -81,28 +83,23 @@ export default function EditProfile() {
     const { name, value } = e.target;
 
     if (name.includes(".")) {
-      const [parent, child] = name.split(".");
-      setUser((prev) => ({
-        ...prev!,
-        [parent]: {
-          ...(prev![parent as keyof User] as object),
-          [child]: value,
-        },
-      }));
-    } else if (name.includes("experience.")) {
-      const [, expField] = name.split("experience.");
-      setUser((prev) => ({
-        ...prev!,
-        experience: {
-          ...(prev!.experience || {}),
-          [expField]: value,
-        },
-      }));
+      const keys = name.split(".");
+      setUser((prev) => {
+        if (!prev) return prev;
+
+        const newState = { ...prev };
+        let current: any = newState;
+
+        for (let i = 0; i < keys.length - 1; i++) {
+          current[keys[i]] = { ...(current[keys[i]] || {}) };
+          current = current[keys[i]];
+        }
+
+        current[keys[keys.length - 1]] = value;
+        return newState;
+      });
     } else {
-      setUser((prev) => ({
-        ...prev!,
-        [name]: value,
-      }));
+      setUser((prev) => (prev ? { ...prev, [name]: value } : prev));
     }
   };
 
@@ -123,8 +120,8 @@ export default function EditProfile() {
 
       const updatedUser = {
         ...user,
-        experience: {
-          ...user.experience,
+        seeker: {
+          ...user.seeker,
           skill: skillsArray.map((name) => ({ name })),
         },
       };
@@ -311,33 +308,36 @@ export default function EditProfile() {
                     placeholder="React, JavaScript, TypeScript"
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     Company Name
                   </label>
                   <Input
-                    name="experience.company_name"
-                    value={user.experience?.company_name || ""}
+                    name="seeker.experience.company_name"
+                    value={user.seeker.experience?.company_name || ""}
                     onChange={handleInputChange}
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     Position
                   </label>
                   <Input
-                    name="experience.position"
-                    value={user.experience?.position || ""}
+                    name="seeker.experience.position"
+                    value={user.seeker.experience?.position || ""}
                     onChange={handleInputChange}
                   />
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">
                     Description
                   </label>
                   <Textarea
-                    name="experience.description"
-                    value={user.experience?.description || ""}
+                    name="seeker.experience.description"
+                    value={user.seeker.experience?.description || ""}
                     onChange={handleInputChange}
                     rows={4}
                   />
@@ -399,8 +399,8 @@ export default function EditProfile() {
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
-  if (user.experience?.skill?.length) completeFields++;
-  if (user.experience?.company_name) completeFields++;
+  if (user.seeker.skills?.length) completeFields++;
+  if (user.seeker.experience?.company_name) completeFields++;
   if (user.seeker.phonenumber) completeFields++;
   if (user.seeker.address) completeFields++;
   if (user.seeker.city) completeFields++;
