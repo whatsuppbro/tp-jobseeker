@@ -17,6 +17,12 @@ export const getUsers = async () => {
 export const getUserById = async (id: string) => {
   const user = await db.query.user.findFirst({
     with: {
+      company: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+      },
       seeker: {
         columns: {
           created_at: false,

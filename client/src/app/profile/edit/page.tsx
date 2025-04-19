@@ -116,7 +116,6 @@ export default function EditProfile() {
 
     setIsSaving(true);
     try {
-      // Process skills
       const skillsArray = skillsInput
         .split(",")
         .map((skill) => skill.trim())
@@ -143,7 +142,6 @@ export default function EditProfile() {
 
       if (!response.ok) throw new Error("Failed to update profile");
 
-      // Update local storage
       const userData = localStorage.getItem("user");
       if (userData) {
         const parsedUser = JSON.parse(userData);

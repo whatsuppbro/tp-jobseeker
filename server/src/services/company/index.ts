@@ -49,15 +49,46 @@ export const createCompany = async (body: CompanyType) => {
   return newCompany;
 };
 
-export const updateCompany = async (id: string, body: Partial<CompanyType>) => {
-  const company = await db
+export const createCompanyByUserId = async (
+  userId: string,
+  body: Omit<CompanyType, "user_id">
+) => {
+  const newCompany = await db.insert(table.company).values({
+    ...body,
+    user_id: userId,
+  });
+
+  return newCompany;
+};
+
+export const updateCompany = async (
+  id: string,
+  body: Omit<CompanyType, "user_id">
+) => {
+  console.log("Updating company with ID:", id);
+  console.log("Update payload:", body);
+
+  const existingCompany = await db.query.company.findFirst({
+    where: eq(table.company.user_id, id),
+  });
+
+  if (!existingCompany) {
+    throw new Error("Company not found");
+  }
+
+  const [updatedCompany] = await db
     .update(table.company)
     .set(body)
-    .where(eq(table.company.id, id));
+    .where(eq(table.company.user_id, id))
+    .returning();
 
-  if (!company) throw new Error("Company not found");
+  console.log("Updated company:", updatedCompany);
 
-  return company;
+  if (!updatedCompany) {
+    throw new Error("Failed to update company");
+  }
+
+  return updatedCompany;
 };
 
 export const deleteCompany = async (id: string) => {

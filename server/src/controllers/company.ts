@@ -3,6 +3,7 @@ import {
   getCompanies,
   getCompanyById,
   getCompanyByUserId,
+  createCompanyByUserId,
   createCompany,
   updateCompany,
   deleteCompany,
@@ -39,6 +40,66 @@ export const companyController = new Elysia({
         return ErrorHandler(error);
       }
     })
+
+    .post(
+      `/`,
+      async ({ body }) => {
+        try {
+          const parsedBody = CompanyModel.parse(body);
+          const company = await createCompany(parsedBody);
+          return SuccessHandler(company);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: CompanyModel,
+      }
+    )
+
+    .post(
+      `/:id`,
+      async ({ params, body }) => {
+        try {
+          const parsedBody = CompanyModel.parse(body);
+          const company = await createCompanyByUserId(params.id, parsedBody);
+          return SuccessHandler(company);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: CompanyModel,
+      }
+    )
+
+    .put(
+      "/:id",
+      async ({ params, body }) => {
+        try {
+          console.log("Incoming body:", body);
+          const company = await updateCompany(params.id, body);
+          if (!company) {
+            throw new Error("Company not found");
+          }
+          return SuccessHandler(company);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: CompanyModel,
+      }
+    )
 
     .delete("/:id", async ({ params }) => {
       try {

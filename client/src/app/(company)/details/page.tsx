@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useRouter, redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface User {
@@ -9,25 +9,19 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  skill?: string[];
-  experience?: {
-    company_name?: string;
-    position?: string;
-    description?: string;
-    skill?: { name: string }[];
+  company: {
+    company_name: string;
+    company_description: string;
+    company_website: string;
+    company_email: string;
+    company_phone: string;
+    company_address: string;
+    company_city: string;
+    company_country: string;
   };
-  seeker: {
-    phonenumber?: string;
-    address?: string;
-    city?: string;
-    resume_url?: string;
-  };
-  company_name?: string;
-  position?: string;
-  description?: string;
 }
 
-export default function Profile() {
+export default function Details() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +38,10 @@ export default function Profile() {
 
         const parsedUser = JSON.parse(userData);
         const userId = parsedUser.id;
+
+        if (parsedUser.role === "seeker") {
+          redirect("/profile");
+        }
 
         const userResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`
@@ -69,14 +67,14 @@ export default function Profile() {
     };
 
     fetchUserData();
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
     if (userData) {
       const parsedUser = JSON.parse(userData);
-      if (parsedUser.role === "company") {
-        redirect("/details");
+      if (parsedUser.role === "seeker") {
+        redirect("/profile");
       }
     }
   }, [router]);
@@ -125,112 +123,76 @@ export default function Profile() {
       </div>
     );
   }
-
   const displayName =
-    `${user.firstname || ""} ${user.lastname || ""}`.trim() || "Seeker";
+    `${user.firstname || ""} ${user.lastname || ""}`.trim() || "Company";
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">
-            Welcome back, <span className="capitalize">{displayName}</span>!
+            Welcome back, <span className="capitalize">{displayName}</span>,
+            <p className="text-xl font-bold">
+              Agency of,{" "}
+              <span className="capitalize">
+                {user.company?.company_name || "Company name"}
+              </span>
+              !
+            </p>
           </h1>
+
           <Button
-            onClick={() => router.push("/profile/edit")}
+            onClick={() => router.push("/details/edit")}
             variant="outline"
           >
-            Edit Profile
+            Edit Details
           </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <ProfileSection title="Personal Information">
+            <ProfileSection title="Company Information">
               <InfoRow
-                label="Full Name"
-                value={displayName || "Not provided"}
+                label="Company Name"
+                value={user.company?.company_name || "Company name"}
               />
               <InfoRow label="Email Address" value={user.email} />
-              <InfoRow
-                label="Phone Number"
-                value={user.seeker.phonenumber || "Not provided"}
-              />
-              <InfoRow
-                label="Address"
-                value={user.seeker.address || "Not provided"}
-              />
-              <InfoRow
-                label="City"
-                value={user.seeker.city || "Not provided"}
-              />
-              <InfoRow
-                label="Resume"
-                value={
-                  user.seeker.resume_url ? (
-                    <a
-                      href={user.seeker.resume_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      View Resume
-                    </a>
-                  ) : (
-                    "Not provided"
-                  )
-                }
-              />
             </ProfileSection>
 
-            <ProfileSection title="Skills & Experience">
-              <InfoRow
-                label="Skills"
-                value={
-                  user.experience?.skill?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {user.experience.skill.map((skill) => (
-                        <span key={skill.name} className="badge">
-                          {skill.name}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    "Not specified"
-                  )
-                }
-              />
-              <InfoRow
-                label="Experience"
-                value={
-                  user.experience?.company_name || "No experience added yet"
-                }
-              />
-              <InfoRow
-                label="Position"
-                value={user.experience?.position || "No position added yet"}
-              />
+            <ProfileSection title="About Your Company">
               <InfoRow
                 label="Description"
                 value={
-                  user.experience?.description || "No description added yet"
+                  user.company?.company_description ||
+                  "No description added yet"
                 }
+              />
+              <InfoRow
+                label="Company Email"
+                value={
+                  user.company?.company_email || "No description added yet"
+                }
+              />
+              <InfoRow
+                label="Company Phone Number"
+                value={user.company?.company_phone || "Not provided"}
+              />
+              <InfoRow
+                label="Company Address"
+                value={user.company?.company_address || "Not provided"}
+              />
+              <InfoRow
+                label="Company City"
+                value={user.company?.company_city || "Not provided"}
+              />
+              <InfoRow
+                label="Company Country"
+                value={user.company?.company_country || "Not provided"}
               />
             </ProfileSection>
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <ProfileSection title="Applications">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 mb-4">
-                  You haven't applied to any jobs yet.
-                </p>
-                <Button onClick={() => router.push("/jobs")}>
-                  Browse Jobs
-                </Button>
-              </div>
-            </ProfileSection>
-
             <ProfileSection title="Profile Strength">
               <div className="w-full bg-gray-100 rounded-full h-2">
                 <div
@@ -239,7 +201,7 @@ export default function Profile() {
                 ></div>
               </div>
               <p className="text-sm text-gray-600 mt-2">
-                Complete your profile to increase visibility to employers.
+                Complete your profile to increase visibility to job seekers.
               </p>
             </ProfileSection>
           </div>
@@ -275,12 +237,10 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
-  if (user.firstname || user.lastname) completeFields++;
-  if (user.experience?.skill?.length) completeFields++;
-  if (user.experience?.company_name) completeFields++;
-  if (user.seeker.phonenumber) completeFields++;
-  if (user.seeker.address) completeFields++;
-  if (user.seeker.city) completeFields++;
-  if (user.seeker.resume_url) completeFields++;
-  return Math.round((completeFields / 8) * 100);
+  if (user.company.company_address) completeFields++;
+  if (user.company.company_phone) completeFields++;
+  if (user.company.company_address) completeFields++;
+  if (user.company.company_city) completeFields++;
+  if (user.company.company_description) completeFields++;
+  return Math.round((completeFields / 6) * 100);
 }
