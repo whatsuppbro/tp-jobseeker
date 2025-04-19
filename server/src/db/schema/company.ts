@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user";
 import { relations } from "drizzle-orm";
+import { jobs } from "./jobs";
 
 export const company = pgTable("company", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -23,9 +24,10 @@ export const company = pgTable("company", {
     .$onUpdate(() => new Date()),
 });
 
-export const companyRelations = relations(company, ({ one }) => ({
+export const companyRelations = relations(company, ({ one, many }) => ({
   user: one(user, {
     fields: [company.user_id],
     references: [user.id],
   }),
+  jobs: many(jobs),
 }));

@@ -3,11 +3,6 @@ import db from "@/db";
 import * as table from "@/db/schema";
 import { SkillType } from "@/db/models/skill";
 
-export const createSkill = async (body: SkillType) => {
-  const newSkill = await db.insert(table.skill).values(body);
-  return newSkill;
-};
-
 export const getSkill = async () => {
   const skill = await db.query.skill.findMany({
     columns: {
@@ -31,9 +26,9 @@ export const getSkillById = async (id: string) => {
   return skill;
 };
 
-export const getSkillByExperienceId = async (experienceId: string) => {
+export const getSkillBySeekerId = async (experienceId: string) => {
   const skill = await db.query.skill.findFirst({
-    where: eq(table.skill.experience_id, experienceId),
+    where: eq(table.skill.seeker_id, experienceId),
     columns: {
       created_at: false,
       updated_at: false,

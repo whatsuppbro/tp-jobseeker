@@ -10,17 +10,20 @@ interface User {
   lastname?: string;
   role: "seeker" | "company";
   skill?: string[];
-  experience?: {
-    company_name?: string;
-    position?: string;
-    description?: string;
-    skill?: { name: string }[];
-  };
   seeker: {
     phonenumber?: string;
     address?: string;
     city?: string;
     resume_url?: string;
+    experience?: {
+      company_name?: string;
+      position?: string;
+      description?: string;
+    };
+    skills?: {
+      id: string;
+      name: string;
+    }[];
   };
   company_name?: string;
   position?: string;
@@ -187,10 +190,10 @@ export default function Profile() {
               <InfoRow
                 label="Skills"
                 value={
-                  user.experience?.skill?.length ? (
+                  user.seeker.skills?.length ? (
                     <div className="flex flex-wrap gap-2">
-                      {user.experience.skill.map((skill) => (
-                        <span key={skill.name} className="badge">
+                      {user.seeker.skills.map((skill) => (
+                        <span key={skill.id} className="badge">
                           {skill.name}
                         </span>
                       ))}
@@ -200,20 +203,27 @@ export default function Profile() {
                   )
                 }
               />
+
               <InfoRow
                 label="Experience"
                 value={
-                  user.experience?.company_name || "No experience added yet"
+                  user.seeker.experience?.company_name ||
+                  "No experience added yet"
                 }
               />
+
               <InfoRow
                 label="Position"
-                value={user.experience?.position || "No position added yet"}
+                value={
+                  user.seeker.experience?.position || "No position added yet"
+                }
               />
+
               <InfoRow
                 label="Description"
                 value={
-                  user.experience?.description || "No description added yet"
+                  user.seeker.experience?.description ||
+                  "No description added yet"
                 }
               />
             </ProfileSection>
@@ -276,8 +286,8 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
-  if (user.experience?.skill?.length) completeFields++;
-  if (user.experience?.company_name) completeFields++;
+  if (user.seeker.skills?.length) completeFields++;
+  if (user.seeker.experience?.company_name) completeFields++;
   if (user.seeker.phonenumber) completeFields++;
   if (user.seeker.address) completeFields++;
   if (user.seeker.city) completeFields++;

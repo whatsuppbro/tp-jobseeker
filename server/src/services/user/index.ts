@@ -28,19 +28,19 @@ export const getUserById = async (id: string) => {
           created_at: false,
           updated_at: false,
         },
-      },
-      experience: {
         with: {
-          skill: {
+          experience: {
             columns: {
               created_at: false,
               updated_at: false,
             },
           },
-        },
-        columns: {
-          created_at: false,
-          updated_at: false,
+          skills: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
         },
       },
     },
