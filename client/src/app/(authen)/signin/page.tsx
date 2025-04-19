@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 import {
   Form,
   FormControl,
@@ -19,8 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import mockUser from "@/mock/user.json";
-import { request } from "http";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -41,82 +38,51 @@ export default function Login() {
     },
   });
 
-  const userList = mockUser as any[];
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    try {
-      // const requestOptions = {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(values),
-      // };
-      // const response = await fetch("/api/auth/login", requestOptions);
-      // if (!response.ok) {
-      //   throw new Error("Failed to fetch user data");
-      // }
-      // const users = await response.json();
-      const users = userList;
 
-      const user = users.find(
-        (u: any) => u.email === values.email && u.password === values.password
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
       );
 
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
+      const data = await response.json();
 
-        window.dispatchEvent(new Event("storage"));
+      if (!data.data.success) {
+        throw new Error(data.data.message || "Invalid email or password");
+      }
 
-        toast.success("Login successful!");
+      const { id, email, role } = data.data.user;
 
-        if (user.role === "company") {
-          router.push("/dashboard");
-        } else {
-          router.push("/profile");
-        }
+      localStorage.setItem("user", JSON.stringify({ id, email, role }));
+
+      window.dispatchEvent(new Event("storage"));
+
+      toast.success("Login successful!");
+
+      if (role === "company") {
+        router.push("/dashboard");
       } else {
-        toast.error("Invalid email or password");
+        router.push("/profile");
       }
     } catch (error) {
-      console.error("Login error", error);
-      toast.error("Failed to login. Please try again.");
+      console.error("Login error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to login. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   }
-  //---------------------------------------------------------------
-  // async function onSubmit(values: z.infer<typeof formSchema>) {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await fetch("/api/auth/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(values),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error(await response.text());
-  //     }
-
-  //     const data = await response.json();
-  //     toast.success("Login successful!");
-
-  //     if (data.user.role === "company") {
-  //       router.push("/dashboard");
-  //     } else {
-  //       router.push("/profile");
-  //     }
-  //   } catch (error) {
-  //     console.error("Login error", error);
-  //     toast.error("Invalid email or password");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }
 
   return (
     <Card className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">

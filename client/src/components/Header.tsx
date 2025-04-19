@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { navList } from "@/data/navList";
+import { navList as defaultNavList } from "@/data/navList";
 import { AlignJustify, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,14 +18,30 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
+  const [navList, setNavList] = useState(defaultNavList);
+
   const checkAuth = () => {
     const userData = localStorage.getItem("user");
     if (userData) {
-      setUser(JSON.parse(userData));
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
       setIsLoggedIn(true);
+
+      if (parsedUser?.role === "company") {
+        setNavList((prevNavList) =>
+          prevNavList.map((item) =>
+            item.name === "Profile"
+              ? { ...item, name: "Details", href: "/details" }
+              : item
+          )
+        );
+      } else {
+        setNavList(defaultNavList);
+      }
     } else {
       setUser(null);
       setIsLoggedIn(false);
+      setNavList(defaultNavList);
     }
   };
 
@@ -46,6 +62,7 @@ export default function Header() {
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUser(null);
+    setNavList(defaultNavList);
     window.dispatchEvent(new Event("storage"));
     router.push("/");
   };
@@ -86,13 +103,15 @@ export default function Header() {
                 </DropdownMenuItem>
 
                 {user?.role === "seeker" && (
-                  <DropdownMenuItem onClick={() => router.push("/saved-jobs")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/job/saved-jobs")}
+                  >
                     Saved Jobs
                   </DropdownMenuItem>
                 )}
                 {user?.role === "seeker" && (
                   <DropdownMenuItem
-                    onClick={() => router.push("/applied-jobs")}
+                    onClick={() => router.push("/job/applied-jobs")}
                   >
                     Applied Jobs
                   </DropdownMenuItem>
@@ -145,14 +164,14 @@ export default function Header() {
                   </DropdownMenuItem>
                   {user?.role === "seeker" && (
                     <DropdownMenuItem
-                      onClick={() => router.push("/saved-jobs")}
+                      onClick={() => router.push("/job/saved-jobs")}
                     >
                       Saved Jobs
                     </DropdownMenuItem>
                   )}
                   {user?.role === "seeker" && (
                     <DropdownMenuItem
-                      onClick={() => router.push("/applied-jobs")}
+                      onClick={() => router.push("/job/applied-jobs")}
                     >
                       Applied Jobs
                     </DropdownMenuItem>

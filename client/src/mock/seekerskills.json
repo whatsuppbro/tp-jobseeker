@@ -2,11 +2,16 @@
   {
     "seeker_id": 1,
     "skill_id": 1,
-    "proficiency_level": "expert"
+    "proficiency_level": "beginner"
   },
   {
     "seeker_id": 1,
     "skill_id": 2,
     "proficiency_level": "intermediate"
+  },
+  {
+    "seeker_id": 1,
+    "skill_id": 3,
+    "proficiency_level": "expert"
   }
 ]
