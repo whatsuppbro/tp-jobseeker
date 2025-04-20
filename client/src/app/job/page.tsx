@@ -24,9 +24,8 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [jobsPerPage] = useState(5); // Number of jobs per page
+  const [jobsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +56,6 @@ export default function Page() {
 
   const locations = [...new Set(jobs.map((job) => job.location))];
 
-  // Filter jobs based on applied filters
   const filteredJobs = jobs.filter((job) => {
     const matchesKeyword =
       filters.keyword === "" ||
@@ -78,7 +76,6 @@ export default function Page() {
     return matchesKeyword && matchesJobType && matchesLocation;
   });
 
-  // Pagination logic
   const indexOfLastJob = currentPage * jobsPerPage;
   const indexOfFirstJob = indexOfLastJob - jobsPerPage;
   const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
