@@ -40,6 +40,17 @@ export const companyController = new Elysia({
         return ErrorHandler(error);
       }
     })
+    .get(`/user/:id`, async ({ params }) => {
+      try {
+        const company = await getCompanyByUserId(params.id);
+        if (!company) {
+          throw new Error("Company not found");
+        }
+        return SuccessHandler(company);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
 
     .post(
       `/`,

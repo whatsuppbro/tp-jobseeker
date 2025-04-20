@@ -52,18 +52,17 @@ export const jobsController = new Elysia({
     .post(
       `/`,
       async ({ body }) => {
-        const parsedBody = JobModel.parse(body);
         try {
-          const jobs = await createJobs(parsedBody);
+          const jobs = await createJobs({ ...body });
+          if (!jobs) {
+            throw new Error("Jobs not found");
+          }
           return SuccessHandler(jobs);
         } catch (error) {
           return ErrorHandler(error);
         }
       },
       {
-        params: t.Object({
-          id: t.String(),
-        }),
         body: JobModel,
       }
     )

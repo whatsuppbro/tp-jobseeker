@@ -5,6 +5,10 @@ import { JobType } from "@/db/models/jobs";
 
 export const getJobs = async () => {
   const jobs = await db.query.jobs.findMany({
+    with: {
+      company: true,
+      applications: true,
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -16,6 +20,10 @@ export const getJobs = async () => {
 export const getJobsById = async (id: string) => {
   const jobs = await db.query.jobs.findFirst({
     where: eq(table.jobs.id, id),
+    with: {
+      company: true,
+      applications: { with: { user: true } },
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -40,8 +48,8 @@ export const getJobsByCompanyId = async (companyId: string) => {
 };
 
 export const createJobs = async (data: JobType) => {
-  const jobs = await db.insert(table.jobs).values(data).returning();
-  return jobs;
+  const newJobs = await db.insert(table.jobs).values(data);
+  return newJobs;
 };
 
 export const updateJobs = async (id: string, data: JobType) => {
