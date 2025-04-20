@@ -25,6 +25,7 @@ export default function Setting() {
     confirmPassword: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -128,6 +129,39 @@ export default function Setting() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    if (!confirmDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${user.id}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete account.");
+      }
+
+      localStorage.removeItem("user");
+      toast.success("Account deleted successfully.");
+      router.push("/signin");
+    } catch (error) {
+      toast.error("Failed to delete account. Please try again.");
+      console.error("Error:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-6 bg-gray-50">
@@ -224,9 +258,24 @@ export default function Setting() {
           </div>
         </div>
 
-        <Button type="submit" disabled={isSaving} className="w-full md:w-auto">
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Button>
+        <div className="flex flex-col md:flex-row gap-4">
+          {" "}
+          <Button
+            type="submit"
+            disabled={isSaving}
+            className="w-full md:w-auto"
+          >
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+          <Button
+            onClick={handleDeleteAccount}
+            disabled={isDeleting}
+            variant="destructive"
+            className="w-full md:w-auto"
+          >
+            {isDeleting ? "Deleting..." : "Delete Account"}
+          </Button>
+        </div>
       </form>
     </div>
   );

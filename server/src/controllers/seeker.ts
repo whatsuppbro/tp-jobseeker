@@ -4,12 +4,13 @@ import {
   getSeekerById,
   getSeekerByUserId,
   createSeeker,
+  createSeekerWithUserId,
   updateSeeker,
   deleteSeeker,
 } from "@/services/seekers";
 import { getSkillBySeeker, updateSkill } from "@/services/seekers/skill";
 import { SeekerModel } from "@/db/models/seekers";
-import { t } from "elysia";
+import { SkillModel } from "@/db/models/skill";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
 
 const controller = "seeker";
@@ -68,8 +69,7 @@ export const seekerController = new Elysia({
       "/:id",
       async ({ params, body }) => {
         try {
-          const parsedBody = SeekerModel.parse(body);
-          const seeker = await updateSeeker(params.id, parsedBody);
+          const seeker = await updateSeeker(params.id, { ...body });
           if (!seeker) {
             throw new Error("Seeker not found");
           }
@@ -82,10 +82,43 @@ export const seekerController = new Elysia({
         body: SeekerModel,
       }
     )
-    .put("/skill/:id", async ({ params, body }) => {
+    .put(
+      "/skill/:id",
+      async ({ params, body }) => {
+        try {
+          const seeker = await updateSkill(params.id, { ...body });
+          if (!seeker) {
+            throw new Error("Seeker not found");
+          }
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: SkillModel,
+      }
+    )
+
+    .post(
+      `/`,
+      async ({ body }) => {
+        try {
+          const parsedBody = SeekerModel.parse(body);
+          const seeker = await createSeeker(parsedBody);
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: SeekerModel,
+      }
+    )
+
+    .post(`/user/:id`, async ({ params }) => {
       try {
-        const parsedBody = SeekerModel.parse(body);
-        const seeker = await updateSkill(params.id, parsedBody);
+        const seeker = await createSeekerWithUserId(params.id);
         if (!seeker) {
           throw new Error("Seeker not found");
         }

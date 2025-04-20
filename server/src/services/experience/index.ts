@@ -63,10 +63,10 @@ export const deleteExperience = async (id: string) => {
   return experience;
 };
 
-export const deleteExperienceByUserId = async (userId: string) => {
+export const deleteExperienceByUserId = async (seekerId: string) => {
   const experience = await db
     .delete(table.experience)
-    .where(eq(table.experience.seeker_id, userId));
+    .where(eq(table.experience.seeker_id, seekerId));
 
   if (!experience) throw new Error("Experience not found");
 
@@ -101,4 +101,18 @@ export const getExperienceBySeekerId = async (seekerId: string) => {
   if (!experience) throw new Error("Experience not found");
 
   return experience;
+};
+
+export const createExperience = async (body: ExperienceType) => {
+  const newExperience = await db.insert(table.experience).values(body);
+
+  return newExperience;
+};
+
+export const createExperienceWithSeekerId = async (seekerId: string) => {
+  const newExperience = await db.insert(table.experience).values({
+    seeker_id: seekerId,
+  });
+
+  return newExperience;
 };

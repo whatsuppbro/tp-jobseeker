@@ -48,6 +48,14 @@ export const createSeeker = async (body: SeekerType) => {
   return newSeeker;
 };
 
+export const createSeekerWithUserId = async (userId: string) => {
+  const newSeeker = await db.insert(table.seeker).values({ user_id: userId });
+
+  if (!newSeeker) throw new Error("Seeker not found");
+
+  return newSeeker;
+};
+
 export const updateSeeker = async (id: string, body: Partial<SeekerType>) => {
   const seeker = await db
     .update(table.seeker)

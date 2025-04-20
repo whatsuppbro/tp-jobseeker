@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { z } from "zod";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -11,23 +13,30 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  seeker: {
-    id: string;
+  seeker?: {
+    id?: string;
     phonenumber?: string;
     address?: string;
     city?: string;
     resume_url?: string;
-    experience?: {
-      company_name?: string;
-      position?: string;
-      description?: string;
-    };
     skills?: {
       id: string;
       name: string;
     }[];
   };
 }
+
+const SeekerFormSchema = z.object({
+  phonenumber: z
+    .string()
+    .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number")
+    .or(z.literal("")),
+  address: z.string(),
+  city: z.string(),
+  resume_url: z.union([z.string().url(), z.literal("")]).optional(),
+});
+
+const SkillsSchema = z.array(z.string().min(1, "Skill cannot be empty"));
 
 export default function EditProfile() {
   const router = useRouter();
@@ -49,7 +58,10 @@ export default function EditProfile() {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`
         );
-        if (!response.ok) throw new Error("Failed to fetch user data");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch user data");
+        }
         const data = await response.json();
         setUser(data.data);
         if (data.data.seeker?.skills) {
@@ -61,6 +73,20 @@ export default function EditProfile() {
         }
       } catch (error) {
         console.error("Error:", error);
+        if (error instanceof Error) {
+          if (error instanceof Error) {
+            if (error instanceof Error) {
+              toast.error(error.message);
+            } else {
+              toast.error("An unknown error occurred");
+            }
+          } else {
+            toast.error("An unknown error occurred");
+          }
+        } else {
+          toast.error("An unknown error occurred");
+        }
+        router.push("/signin");
       } finally {
         setIsLoading(false);
       }
@@ -77,7 +103,7 @@ export default function EditProfile() {
       setUser((prev) => {
         if (!prev) return prev;
         const newState = { ...prev };
-        let current = newState;
+        let current: any = newState;
         for (const key of keys.slice(0, -1)) {
           current[key] = { ...current[key] };
           current = current[key];
@@ -96,64 +122,83 @@ export default function EditProfile() {
 
     setIsSaving(true);
     try {
-      const seekerResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/seeker/${user.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: user.id,
-            phonenumber: user.seeker.phonenumber,
-            address: user.seeker.address,
-            city: user.seeker.city,
-            resume_url: user.seeker.resume_url,
-          }),
-        }
-      );
-      if (!seekerResponse.ok) throw new Error("Failed to update profile");
+      const seekerFormData = {
+        phonenumber: user.seeker?.phonenumber || "",
+        address: user.seeker?.address || "",
+        city: user.seeker?.city || "",
+        resume_url: user.seeker?.resume_url || "",
+      };
+
+      const seekerValidation = SeekerFormSchema.safeParse(seekerFormData);
+      if (!seekerValidation.success) {
+        seekerValidation.error.issues.forEach((issue) => {
+          toast.error(issue.message);
+        });
+        return;
+      }
 
       const skillsArray = skillsInput
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
-      const skillsResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/seeker/skill/${user.seeker.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ skills: skillsArray }),
-        }
-      );
-      if (!skillsResponse.ok) throw new Error("Failed to update skills");
+      const skillsValidation = SkillsSchema.safeParse(skillsArray);
+      if (!skillsValidation.success) {
+        skillsValidation.error.issues.forEach((issue) => {
+          toast.error(issue.message);
+        });
+        return;
+      }
 
-      const experienceResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/experience/user/${user.seeker.id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(user.seeker.experience || {}),
-        }
-      );
-      if (!experienceResponse.ok)
-        throw new Error("Failed to update experience");
+      let seekerId: string;
+      if (user.seeker?.id) {
+        const seekerResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/seeker/${user.seeker.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: user.id,
+              phonenumber: user.seeker.phonenumber,
+              address: user.seeker.address,
+              city: user.seeker.city,
+              resume_url: user.seeker.resume_url,
+            }),
+          }
+        );
+        if (!seekerResponse.ok) throw new Error("Failed to update seeker");
+        seekerId = user.seeker.id;
+      } else {
+        const seekerResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/seeker/user/${user.id}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_id: user.id,
+              phonenumber: user.seeker?.phonenumber,
+              address: user.seeker?.address,
+              city: user.seeker?.city,
+              resume_url: user.seeker?.resume_url,
+            }),
+          }
+        );
+        if (!seekerResponse.ok) throw new Error("Failed to create seeker");
+        const seekerData = await seekerResponse.json();
+        seekerId = seekerData.data.id;
+      }
 
-      const updatedUser = {
-        ...user,
-        seeker: {
-          ...user.seeker,
-          skills: skillsArray.map((name) => ({ name })),
-        },
-      };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-
+      toast.success("Profile updated successfully");
       router.push("/profile");
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Check console for details.");
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-12">Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -195,7 +240,7 @@ export default function EditProfile() {
                     To change your name or email, go to{" "}
                     <span
                       className="text-blue-600 cursor-pointer hover:underline"
-                      onClick={() => router.push("/settings")}
+                      onClick={() => router.push("/setting")}
                     >
                       Settings
                     </span>
@@ -268,55 +313,6 @@ export default function EditProfile() {
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-              <h2 className="text-xl font-semibold mb-4">
-                Skills & Experience
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
-                    Skills (comma separated)
-                  </label>
-                  <Input
-                    value={skillsInput}
-                    onChange={(e) => setSkillsInput(e.target.value)}
-                    placeholder="React, JavaScript, TypeScript"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
-                    Company Name
-                  </label>
-                  <Input
-                    name="seeker.experience.company_name"
-                    value={user?.seeker?.experience?.company_name || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
-                    Position
-                  </label>
-                  <Input
-                    name="seeker.experience.position"
-                    value={user?.seeker?.experience?.position || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
-                    Description
-                  </label>
-                  <Textarea
-                    name="seeker.experience.description"
-                    value={user?.seeker?.experience?.description || ""}
-                    onChange={handleInputChange}
-                    rows={4}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="lg:col-span-1 space-y-6">
@@ -346,21 +342,12 @@ export default function EditProfile() {
                   <a
                     href={user?.seeker?.resume_url}
                     target="_blank"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline "
                   >
-                    {user?.seeker?.resume_url || "No resume uploaded"}
+                    <p className="line-clamp-3">
+                      {user?.seeker?.resume_url || "No resume uploaded"}
+                    </p>
                   </a>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Experience
-                  </p>
-                  <p className="text-gray-900">
-                    {user?.seeker?.experience?.company_name &&
-                    user?.seeker?.experience?.position
-                      ? `${user.seeker?.experience.position} at ${user.seeker?.experience.company_name}`
-                      : "Not provided"}
-                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Skills</p>

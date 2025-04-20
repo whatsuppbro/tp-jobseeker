@@ -154,12 +154,14 @@ export default function Profile() {
           <h1 className="text-3xl font-bold">
             Welcome back, <span className="capitalize">{displayName}</span>!
           </h1>
-          <Button
-            onClick={() => router.push("/profile/edit")}
-            variant="outline"
-          >
-            Edit Profile
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/profile/edit")}
+              variant="outline"
+            >
+              Edit Profile
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -4,6 +4,7 @@ export const ExperienceModel = t.Object({
   seeker_id: t.String(),
   company_name: t.String(),
   position: t.String(),
+  experience_years: t.String(),
   description: t.Optional(t.String()),
 });
 

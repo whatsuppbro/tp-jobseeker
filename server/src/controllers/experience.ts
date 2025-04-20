@@ -6,6 +6,8 @@ import {
   updateExperience,
   deleteExperience,
   getExperienceBySeekerId,
+  createExperience,
+  createExperienceWithSeekerId,
   updateExperienceBySeekerId,
 } from "@/services/experience";
 import { ExperienceModel } from "@/db/models/experience";
@@ -66,9 +68,6 @@ export const experienceController = new Elysia({
         }
       },
       {
-        params: t.Object({
-          id: t.String(),
-        }),
         body: ExperienceModel,
       }
     )
@@ -83,6 +82,35 @@ export const experienceController = new Elysia({
           if (!experience) {
             throw new Error("Experience not found");
           }
+          return SuccessHandler(experience);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: ExperienceModel,
+      }
+    )
+
+    .post(
+      "/",
+      async ({ body }) => {
+        try {
+          const experience = await createExperience(body);
+          return SuccessHandler(experience);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: ExperienceModel,
+      }
+    )
+    .post(
+      "/seeker/:id",
+      async ({ params }) => {
+        try {
+          const experience = await createExperienceWithSeekerId(params.id);
           return SuccessHandler(experience);
         } catch (error) {
           return ErrorHandler(error);
