@@ -2,10 +2,11 @@ import Elysia from "elysia";
 import {
   getExperience,
   getExperienceById,
-  getExperienceByUserId,
   getExperienceWithSkill,
   updateExperience,
   deleteExperience,
+  getExperienceBySeekerId,
+  updateExperienceBySeekerId,
 } from "@/services/experience";
 import { ExperienceModel } from "@/db/models/experience";
 import { t } from "elysia";
@@ -40,18 +41,6 @@ export const experienceController = new Elysia({
       }
     })
 
-    .get(`/user/:id`, async ({ params }) => {
-      try {
-        const experience = await getExperienceByUserId(params.id);
-        if (!experience) {
-          throw new Error("Experience not found");
-        }
-        return SuccessHandler(experience);
-      } catch (error) {
-        return ErrorHandler(error);
-      }
-    })
-
     .delete("/:id", async ({ params }) => {
       try {
         const experience = await deleteExperience(params.id);
@@ -63,4 +52,44 @@ export const experienceController = new Elysia({
         return ErrorHandler(error);
       }
     })
+    .put(
+      "/:id",
+      async ({ params, body }) => {
+        try {
+          const experience = await updateExperience(params.id, { ...body });
+          if (!experience) {
+            throw new Error("Experience not found");
+          }
+          return SuccessHandler(experience);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: ExperienceModel,
+      }
+    )
+
+    .put(
+      "/user/:id",
+      async ({ params, body }) => {
+        try {
+          const experience = await updateExperience(params.id, {
+            ...body,
+          });
+          if (!experience) {
+            throw new Error("Experience not found");
+          }
+          return SuccessHandler(experience);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: ExperienceModel,
+      }
+    )
 );

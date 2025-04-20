@@ -43,7 +43,7 @@ export default async function JobDetail({
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/jobs/${params.id}`
     );
-    if (!response.ok) return redirect("/not-found");
+    if (!response.ok) return redirect("/#");
     const jobData = await response.json();
     const job: Job = jobData.data;
 
@@ -97,7 +97,7 @@ export default async function JobDetail({
             </p>
           </CardContent>
         </Card>
-        <ApplyButton jobId={job.id} pendingUserIds={pendingUserIds} />
+        <ApplyButton jobId={job.id} applications={job.applications} />
       </div>
     );
   } catch (error) {

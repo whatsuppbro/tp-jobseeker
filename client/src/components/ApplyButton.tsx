@@ -6,29 +6,35 @@ import { useEffect, useState } from "react";
 
 interface ApplyButtonProps {
   jobId: string;
-  pendingUserIds: string[];
+  applications: {
+    id: string;
+    user_id: string;
+    status: "pending" | "accepted" | "rejected";
+  }[];
 }
 
-export default function ApplyButton({
-  jobId,
-  pendingUserIds,
-}: ApplyButtonProps) {
+export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
   const router = useRouter();
-  const [hasApplied, setHasApplied] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState<
+    "pending" | "accepted" | "rejected" | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const checkApplication = async () => {
+    const checkApplicationStatus = async () => {
       const userData = localStorage.getItem("user");
       if (!userData) return;
       const parsedUser = JSON.parse(userData);
-      setHasApplied(pendingUserIds.includes(parsedUser.id));
+      const userApplication = applications.find(
+        (app) => app.user_id === parsedUser.id
+      );
+      setApplicationStatus(userApplication?.status || null);
     };
-    checkApplication();
-  }, [pendingUserIds]);
+    checkApplicationStatus();
+  }, [applications]);
 
   const handleApply = async () => {
-    if (hasApplied) return;
+    if (applicationStatus) return;
 
     setIsLoading(true);
     try {
@@ -55,7 +61,7 @@ export default function ApplyButton({
 
       if (!response.ok) throw new Error("Failed to submit application");
       toast.success("Application submitted!");
-      setHasApplied(true);
+      setApplicationStatus("pending");
     } catch (error) {
       toast.error("Error submitting application.");
       console.error(error);
@@ -64,18 +70,31 @@ export default function ApplyButton({
     }
   };
 
+  const buttonText = isLoading
+    ? "Applying..."
+    : applicationStatus === "accepted"
+    ? "Accepted"
+    : applicationStatus === "rejected"
+    ? "Rejected"
+    : applicationStatus === "pending"
+    ? "Pending"
+    : "Apply for this Job";
+
+  const buttonVariant =
+    applicationStatus === "accepted"
+      ? "approved"
+      : applicationStatus === "rejected"
+      ? "destructive"
+      : "default";
+
   return (
     <div className="flex justify-center mt-4">
       <Button
         onClick={handleApply}
-        disabled={hasApplied || isLoading}
-        variant={hasApplied ? "secondary" : "default"}
+        disabled={!!applicationStatus || isLoading}
+        variant={buttonVariant}
       >
-        {hasApplied
-          ? "Pending"
-          : isLoading
-          ? "Applying..."
-          : "Apply for this Job"}
+        {buttonText}
       </Button>
     </div>
   );

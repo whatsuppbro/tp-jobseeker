@@ -17,6 +17,20 @@ export const getUsers = async () => {
 export const getUserById = async (id: string) => {
   const user = await db.query.user.findFirst({
     with: {
+      applications: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          job: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
       company: {
         columns: {
           created_at: false,

@@ -10,3 +10,14 @@ export const getSkillBySeeker = async (id: string) => {
 
   return { message: "Get skill by experience", data: result };
 };
+
+export const updateSkill = async (id: string, body: Partial<SkillType>) => {
+  const result = await db
+    .update(skill)
+    .set(body)
+    .where(eq(skill.id, id))
+    .returning()
+    .execute();
+
+  return { message: "Update skill", data: result[0] };
+};

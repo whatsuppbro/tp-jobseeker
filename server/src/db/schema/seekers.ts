@@ -1,7 +1,6 @@
 import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./user";
 import { relations } from "drizzle-orm";
-import { application } from "./application";
 import { skill } from "./skill";
 import { experience } from "./experience";
 
@@ -31,6 +30,5 @@ export const seekerRelations = relations(seeker, ({ one, many }) => ({
     fields: [seeker.id],
     references: [experience.seeker_id],
   }),
-  applications: many(application),
   skills: many(skill),
 }));

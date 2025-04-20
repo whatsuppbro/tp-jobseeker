@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -9,6 +10,21 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
+  applications?: [
+    {
+      id: string;
+      job_id: string;
+      status: "pending" | "accepted" | "rejected";
+      job?: {
+        id: string;
+        title: string;
+        description: string;
+        location: string;
+        salary: string;
+        job_type: string;
+      };
+    }
+  ];
   seeker: {
     phonenumber?: string;
     address?: string;
@@ -20,8 +36,8 @@ interface User {
       description?: string;
     };
     skills?: {
-      id: string;
-      name: string;
+      id?: string;
+      name?: string;
     }[];
   };
   company_name?: string;
@@ -156,20 +172,20 @@ export default function Profile() {
               <InfoRow label="Email Address" value={user.email} />
               <InfoRow
                 label="Phone Number"
-                value={user.seeker.phonenumber || "Not provided"}
+                value={user.seeker?.phonenumber || "Not provided"}
               />
               <InfoRow
                 label="Address"
-                value={user.seeker.address || "Not provided"}
+                value={user.seeker?.address || "Not provided"}
               />
               <InfoRow
                 label="City"
-                value={user.seeker.city || "Not provided"}
+                value={user.seeker?.city || "Not provided"}
               />
               <InfoRow
                 label="Resume"
                 value={
-                  user.seeker.resume_url ? (
+                  user.seeker?.resume_url ? (
                     <a
                       href={user.seeker.resume_url}
                       target="_blank"
@@ -189,7 +205,7 @@ export default function Profile() {
               <InfoRow
                 label="Skills"
                 value={
-                  user.seeker.skills?.length ? (
+                  user.seeker?.skills?.length ? (
                     <div className="flex flex-wrap gap-2">
                       {user.seeker.skills.map((skill) => (
                         <span
@@ -209,7 +225,7 @@ export default function Profile() {
               <InfoRow
                 label="Experience"
                 value={
-                  user.seeker.experience?.company_name ||
+                  user.seeker?.experience?.company_name ||
                   "No experience added yet"
                 }
               />
@@ -217,14 +233,14 @@ export default function Profile() {
               <InfoRow
                 label="Position"
                 value={
-                  user.seeker.experience?.position || "No position added yet"
+                  user.seeker?.experience?.position || "No position added yet"
                 }
               />
 
               <InfoRow
                 label="Description"
                 value={
-                  user.seeker.experience?.description ||
+                  user.seeker?.experience?.description ||
                   "No description added yet"
                 }
               />
@@ -233,11 +249,74 @@ export default function Profile() {
 
           <div className="lg:col-span-1 space-y-6">
             <ProfileSection title="Applications">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 mb-4">
-                  You haven't applied to any jobs yet.
-                </p>
-                <Button onClick={() => router.push("/job")}>Browse Jobs</Button>
+              {user.applications && user.applications.length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Applications</h3>
+                  {user.applications
+                    .filter(
+                      (application) =>
+                        application.status === "accepted" ||
+                        application.status === "pending"
+                    )
+                    .map((application) => (
+                      <Link
+                        key={application.id}
+                        href={`/job/${application.job_id}`}
+                        className="block p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100 transition"
+                      >
+                        <h3 className="text-lg font-semibold">
+                          {application.job?.title || "Job Title Not Available"}
+                        </h3>
+                        <p className="text-gray-600">
+                          {application.job?.description || "No description"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Status:{" "}
+                          <span
+                            className={
+                              application.status === "accepted"
+                                ? "text-green-500"
+                                : "text-yellow-500"
+                            }
+                          >
+                            {application.status.charAt(0).toUpperCase() +
+                              application.status.slice(1)}
+                          </span>
+                        </p>
+                      </Link>
+                    ))}
+                  {user.applications.filter(
+                    (app) =>
+                      app.status === "accepted" || app.status === "pending"
+                  ).length === 0 && (
+                    <p className="text-gray-500 text-center">
+                      No applications to display.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center p-4  rounded-lg">
+                  <p className="text-gray-500 mb-4">
+                    You haven't applied to any jobs yet.
+                  </p>
+                  <Button onClick={() => router.push("/job")}>
+                    Browse Jobs
+                  </Button>
+                </div>
+              )}
+              <div className="flex justify-between mt-4">
+                <Button
+                  onClick={() => router.push("/applied-jobs")}
+                  variant="outline"
+                >
+                  Applied Jobs
+                </Button>
+                <Button
+                  onClick={() => router.push("/saved-jobs")}
+                  variant="outline"
+                >
+                  Saved Jobs
+                </Button>
               </div>
             </ProfileSection>
 
@@ -286,11 +365,11 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
-  if (user.seeker.skills?.length) completeFields++;
-  if (user.seeker.experience?.company_name) completeFields++;
-  if (user.seeker.phonenumber) completeFields++;
-  if (user.seeker.address) completeFields++;
-  if (user.seeker.city) completeFields++;
-  if (user.seeker.resume_url) completeFields++;
+  if (user.seeker?.skills?.length) completeFields++;
+  if (user.seeker?.experience?.company_name) completeFields++;
+  if (user.seeker?.phonenumber) completeFields++;
+  if (user.seeker?.address) completeFields++;
+  if (user.seeker?.city) completeFields++;
+  if (user.seeker?.resume_url) completeFields++;
   return Math.round((completeFields / 8) * 100);
 }

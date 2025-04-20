@@ -39,21 +39,6 @@ export const getExperienceById = async (id: string) => {
   return experience;
 };
 
-export const getExperienceByUserId = async (userId: string) => {
-  const experience = await db.query.experience.findFirst({
-    where: eq(table.experience.seeker_id, userId),
-
-    columns: {
-      created_at: false,
-      updated_at: false,
-    },
-  });
-
-  if (!experience) throw new Error("Experience not found");
-
-  return experience;
-};
-
 export const updateExperience = async (
   id: string,
   body: Partial<ExperienceType>
@@ -82,6 +67,36 @@ export const deleteExperienceByUserId = async (userId: string) => {
   const experience = await db
     .delete(table.experience)
     .where(eq(table.experience.seeker_id, userId));
+
+  if (!experience) throw new Error("Experience not found");
+
+  return experience;
+};
+
+export const updateExperienceBySeekerId = async (
+  seekerId: string,
+  body: Partial<ExperienceType>
+) => {
+  const experience = await db
+    .update(table.experience)
+    .set(body)
+    .where(eq(table.experience.seeker_id, seekerId))
+    .returning()
+    .execute();
+
+  if (!experience) throw new Error("Experience not found");
+
+  return experience[0];
+};
+
+export const getExperienceBySeekerId = async (seekerId: string) => {
+  const experience = await db.query.experience.findFirst({
+    where: eq(table.experience.seeker_id, seekerId),
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
+  });
 
   if (!experience) throw new Error("Experience not found");
 

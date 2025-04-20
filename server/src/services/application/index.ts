@@ -27,14 +27,31 @@ export const getApplicationsById = async (id: string) => {
 };
 
 export const getApplicationsByUserId = async (userId: string) => {
-  const applications = await db.query.application.findFirst({
+  const applications = await db.query.application.findMany({
     where: eq(table.application.user_id, userId),
+    with: {
+      job: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          company: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
+    },
     columns: {
       created_at: false,
       updated_at: false,
     },
   });
-  if (!applications) throw new Error("Application not found");
+  if (!applications || applications.length === 0)
+    throw new Error("Applications not found");
 
   return applications;
 };

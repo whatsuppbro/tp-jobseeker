@@ -38,3 +38,15 @@ export const getSkillBySeekerId = async (experienceId: string) => {
 
   return skill;
 };
+
+export const updateSkill = async (id: string, body: Partial<SkillType>) => {
+  const skill = await db
+    .update(table.skill)
+    .set(body)
+    .where(eq(table.skill.id, id))
+    .returning()
+    .execute();
+  if (!skill) throw new Error("Skill not found");
+
+  return skill[0];
+};
