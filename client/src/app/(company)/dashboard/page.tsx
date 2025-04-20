@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Job {
   id: string;
@@ -61,13 +62,13 @@ export default function Dashboard() {
       try {
         const userData = localStorage.getItem("user");
         if (!userData) {
-          console.error("No user data found in localStorage.");
+          toast.error("No user data found. Redirecting to sign-in.");
           router.push("/signin");
           return;
         }
         const parsedUser = JSON.parse(userData);
         if (parsedUser.role !== "company") {
-          console.error("Access denied: Not a company account.");
+          toast.error("Access denied: Not a company account.");
           return;
         }
         const companyId = parsedUser.id;
@@ -76,10 +77,6 @@ export default function Dashboard() {
           `${process.env.NEXT_PUBLIC_API_URL}/company/user/${companyId}`
         );
         if (!companyResponse.ok) {
-          console.error(
-            "Failed to fetch company data:",
-            await companyResponse.text()
-          );
           throw new Error("Failed to fetch company data");
         }
         const companyData = await companyResponse.json();
@@ -89,7 +86,6 @@ export default function Dashboard() {
           `${process.env.NEXT_PUBLIC_API_URL}/jobs?company_id=${companyId}`
         );
         if (!jobsResponse.ok) {
-          console.error("Failed to fetch jobs:", await jobsResponse.text());
           throw new Error("Failed to fetch jobs");
         }
         const jobsData = await jobsResponse.json();
@@ -100,7 +96,10 @@ export default function Dashboard() {
           }))
         );
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        toast.error(
+          "Error fetching dashboard data. " +
+            (error instanceof Error ? error.message : "Unknown error")
+        );
       } finally {
         setIsLoading(false);
       }
@@ -142,8 +141,10 @@ export default function Dashboard() {
         job_type: "",
       });
 
+      toast.success("Job posted successfully!");
       window.location.reload();
     } catch (error) {
+      toast.error("Error posting job.");
       console.error("Error posting job:", error);
     }
   };

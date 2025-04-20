@@ -1,19 +1,40 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
 
 interface ApplyButtonProps {
   jobId: string;
+  pendingUserIds: string[];
 }
 
-export default function ApplyButton({ jobId }: ApplyButtonProps) {
+export default function ApplyButton({
+  jobId,
+  pendingUserIds,
+}: ApplyButtonProps) {
   const router = useRouter();
+  const [hasApplied, setHasApplied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const checkApplication = async () => {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+      const parsedUser = JSON.parse(userData);
+      setHasApplied(pendingUserIds.includes(parsedUser.id));
+    };
+    checkApplication();
+  }, [pendingUserIds]);
 
   const handleApply = async () => {
+    if (hasApplied) return;
+
+    setIsLoading(true);
     try {
       const userData = localStorage.getItem("user");
       if (!userData) {
-        alert("Please sign in to apply for this job.");
+        toast.error("Please sign in to apply.");
         router.push("/signin");
         return;
       }
@@ -26,18 +47,36 @@ export default function ApplyButton({ jobId }: ApplyButtonProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             job_id: jobId,
-            applicant_id: parsedUser.id,
+            user_id: parsedUser.id,
+            status: "pending",
           }),
         }
       );
 
       if (!response.ok) throw new Error("Failed to submit application");
-      alert("Your application has been submitted successfully!");
+      toast.success("Application submitted!");
+      setHasApplied(true);
     } catch (error) {
-      console.error("Error submitting application:", error);
-      alert("An error occurred while submitting your application.");
+      toast.error("Error submitting application.");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return <Button onClick={handleApply}>Apply for this Job</Button>;
+  return (
+    <div className="flex justify-center mt-4">
+      <Button
+        onClick={handleApply}
+        disabled={hasApplied || isLoading}
+        variant={hasApplied ? "secondary" : "default"}
+      >
+        {hasApplied
+          ? "Pending"
+          : isLoading
+          ? "Applying..."
+          : "Apply for this Job"}
+      </Button>
+    </div>
+  );
 }

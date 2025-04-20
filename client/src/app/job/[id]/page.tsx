@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Card,
@@ -26,8 +25,9 @@ interface Job {
     company_city: string;
     company_country: string;
   };
-  applicants: {
+  applications: {
     id: string;
+    user_id: string;
     name: string;
     email: string;
     status: "pending" | "accepted" | "rejected";
@@ -43,11 +43,13 @@ export default async function JobDetail({
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/jobs/${params.id}`
     );
-    if (!response.ok) {
-      return redirect("/not-found");
-    }
+    if (!response.ok) return redirect("/not-found");
     const jobData = await response.json();
     const job: Job = jobData.data;
+
+    const pendingUserIds = job.applications
+      .filter((app) => app.status === "pending")
+      .map((app) => app.user_id);
 
     return (
       <div className="container mx-auto px-4 py-12 space-y-12">
@@ -95,14 +97,11 @@ export default async function JobDetail({
             </p>
           </CardContent>
         </Card>
-
-        <div className="flex justify-center">
-          <ApplyButton jobId={job.id} />
-        </div>
+        <ApplyButton jobId={job.id} pendingUserIds={pendingUserIds} />
       </div>
     );
   } catch (error) {
     console.error("Error fetching job details:", error);
-    return redirect("/error");
+    return redirect("/#");
   }
 }

@@ -8,6 +8,7 @@ import {
   getApplicationsByUserId,
   getApplicationsByJobId,
   createApplications,
+  updateApplications,
 } from "@/services/application";
 
 const controller = "applications";
@@ -62,18 +63,28 @@ export const applicationController = new Elysia({
     .post(
       `/`,
       async ({ body }) => {
-        const parsedBody = ApplicationModel.parse(body);
         try {
-          const applications = await createApplications(parsedBody);
+          const applications = await createApplications({ ...body });
           return SuccessHandler(applications);
         } catch (error) {
           return ErrorHandler(error);
         }
       },
       {
-        params: t.Object({
-          id: t.String(),
-        }),
+        body: ApplicationModel,
+      }
+    )
+    .put(
+      `/:id`,
+      async ({ params, body }) => {
+        try {
+          const applications = await updateApplications(params.id, { ...body });
+          return SuccessHandler(applications);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
         body: ApplicationModel,
       }
     )

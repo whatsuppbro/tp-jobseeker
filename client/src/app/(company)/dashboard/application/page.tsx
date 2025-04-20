@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "sonner";
 
 interface Job {
   id: string;
@@ -45,7 +46,7 @@ export default function ApplicationsDetails() {
   useEffect(() => {
     const fetchJobDetails = async () => {
       if (!jobId) {
-        console.error("No job ID provided.");
+        toast.error("No job ID provided.");
         setIsLoading(false);
         return;
       }
@@ -64,6 +65,7 @@ export default function ApplicationsDetails() {
 
         setJob(jobWithApplications);
       } catch (error) {
+        toast.error("Error fetching job details.");
         console.error("Error fetching job details:", error);
       } finally {
         setIsLoading(false);
@@ -85,7 +87,13 @@ export default function ApplicationsDetails() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({
+            job_id: jobId,
+            user_id: job?.applications.find(
+              (application) => application.id === applicationId
+            )?.user.id,
+            status,
+          }),
         }
       );
 
@@ -103,7 +111,15 @@ export default function ApplicationsDetails() {
           ),
         };
       });
+
+      toast.success(
+        `Application ${
+          status === "accepted" ? "accepted" : "rejected"
+        } successfully.`
+      );
+      window.location.reload();
     } catch (error) {
+      toast.error("Error updating application status.");
       console.error("Error updating application status:", error);
     }
   };
@@ -123,9 +139,10 @@ export default function ApplicationsDetails() {
 
       if (!response.ok) throw new Error("Failed to delete job");
 
-      alert("Job deleted successfully");
+      toast.success("Job deleted successfully.");
       router.push("/dashboard");
     } catch (error) {
+      toast.error("Error deleting job.");
       console.error("Error deleting job:", error);
     }
   };
