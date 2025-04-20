@@ -109,9 +109,19 @@ export const createExperience = async (body: ExperienceType) => {
   return newExperience;
 };
 
-export const createExperienceWithSeekerId = async (seekerId: string) => {
+export const createExperienceWithSeekerId = async (
+  seekerId: string,
+  company_name: string,
+  position: string,
+  experience_years: string,
+  description: string | undefined
+) => {
   const newExperience = await db.insert(table.experience).values({
     seeker_id: seekerId,
+    company_name,
+    position,
+    experience_years,
+    description,
   });
 
   return newExperience;

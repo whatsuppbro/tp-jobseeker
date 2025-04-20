@@ -17,6 +17,10 @@ export const getSeekers = async () => {
 export const getSeekerById = async (id: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.id, id),
+    with: {
+      experience: true,
+      skills: true,
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -31,6 +35,10 @@ export const getSeekerById = async (id: string) => {
 export const getSeekerByUserId = async (userId: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.user_id, userId),
+    with: {
+      experience: true,
+      skills: true,
+    },
     columns: {
       created_at: false,
       updated_at: false,

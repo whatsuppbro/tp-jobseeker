@@ -19,10 +19,6 @@ interface User {
     address?: string;
     city?: string;
     resume_url?: string;
-    skills?: {
-      id: string;
-      name: string;
-    }[];
   };
 }
 
@@ -36,14 +32,11 @@ const SeekerFormSchema = z.object({
   resume_url: z.union([z.string().url(), z.literal("")]).optional(),
 });
 
-const SkillsSchema = z.array(z.string().min(1, "Skill cannot be empty"));
-
 export default function EditProfile() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [skillsInput, setSkillsInput] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -64,13 +57,6 @@ export default function EditProfile() {
         }
         const data = await response.json();
         setUser(data.data);
-        if (data.data.seeker?.skills) {
-          setSkillsInput(
-            data.data.seeker.skills
-              .map((s: { name: string }) => s.name)
-              .join(", ")
-          );
-        }
       } catch (error) {
         console.error("Error:", error);
         if (error instanceof Error) {
@@ -132,18 +118,6 @@ export default function EditProfile() {
       const seekerValidation = SeekerFormSchema.safeParse(seekerFormData);
       if (!seekerValidation.success) {
         seekerValidation.error.issues.forEach((issue) => {
-          toast.error(issue.message);
-        });
-        return;
-      }
-
-      const skillsArray = skillsInput
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-      const skillsValidation = SkillsSchema.safeParse(skillsArray);
-      if (!skillsValidation.success) {
-        skillsValidation.error.issues.forEach((issue) => {
           toast.error(issue.message);
         });
         return;
@@ -348,23 +322,6 @@ export default function EditProfile() {
                       {user?.seeker?.resume_url || "No resume uploaded"}
                     </p>
                   </a>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Skills</p>
-                  <div className="flex flex-wrap gap-2">
-                    {skillsInput
-                      .split(",")
-                      .map((skill) => skill.trim())
-                      .filter((skill) => skill.length > 0)
-                      .map((skill, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 rounded-md text-sm"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                  </div>
                 </div>
               </div>
             </div>

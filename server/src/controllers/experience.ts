@@ -108,16 +108,27 @@ export const experienceController = new Elysia({
     )
     .post(
       "/seeker/:id",
-      async ({ params }) => {
+      async ({ params, body }) => {
         try {
-          const experience = await createExperienceWithSeekerId(params.id);
+          const experience = await createExperienceWithSeekerId(
+            params.id,
+            body.company_name,
+            body.position,
+            body.experience_years,
+            body.description
+          );
           return SuccessHandler(experience);
         } catch (error) {
           return ErrorHandler(error);
         }
       },
       {
-        body: ExperienceModel,
+        body: t.Object({
+          company_name: t.String(),
+          position: t.String(),
+          experience_years: t.String(),
+          description: t.Optional(t.String()),
+        }),
       }
     )
 );

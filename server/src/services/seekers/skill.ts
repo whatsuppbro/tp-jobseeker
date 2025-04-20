@@ -21,3 +21,9 @@ export const updateSkill = async (id: string, body: Partial<SkillType>) => {
 
   return { message: "Update skill", data: result[0] };
 };
+
+export const createSkillBySeekerId = async (body: SkillType) => {
+  const result = await db.insert(skill).values(body).returning().execute();
+
+  return { message: "Create skill", data: result[0] };
+};

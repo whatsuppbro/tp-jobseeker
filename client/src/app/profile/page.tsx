@@ -33,6 +33,7 @@ interface User {
     experience?: {
       company_name?: string;
       position?: string;
+      experience_years?: string;
       description?: string;
     };
     skills?: {
@@ -202,7 +203,6 @@ export default function Profile() {
                 }
               />
             </ProfileSection>
-
             <ProfileSection title="Skills & Experience">
               <InfoRow
                 label="Skills"
@@ -231,6 +231,13 @@ export default function Profile() {
                   "No experience added yet"
                 }
               />
+              <InfoRow
+                label="Year active"
+                value={
+                  user.seeker?.experience?.experience_years ||
+                  "No experience added yet"
+                }
+              />
 
               <InfoRow
                 label="Position"
@@ -246,6 +253,14 @@ export default function Profile() {
                   "No description added yet"
                 }
               />
+              <div className="flex justify-end w-full mt-4 sm:mt-0">
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => router.push("/profile/experience/")}
+                >
+                  Experience Setups
+                </Button>
+              </div>
             </ProfileSection>
           </div>
 
