@@ -168,10 +168,10 @@ export default function Dashboard() {
           Welcome to JobTP
         </h1>
         <p className="max-w-md text-center text-gray-600">
-          Sign in to view your company dashboard.
+          Create company to view dashboard.
         </p>
-        <Button onClick={() => router.push("/signin")} size="lg">
-          Sign In
+        <Button onClick={() => router.push("/details/edit")} size="lg">
+          Create Company
         </Button>
       </div>
     );

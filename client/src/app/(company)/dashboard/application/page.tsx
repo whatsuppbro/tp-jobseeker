@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { Search } from "lucide-react";
 
 interface Job {
   id: string;
@@ -209,6 +210,7 @@ export default function ApplicationsDetails() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Applicants</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -220,6 +222,17 @@ export default function ApplicationsDetails() {
                   </TableCell>
                   <TableCell>{application.user.email}</TableCell>
                   <TableCell>{application.status}</TableCell>
+                  <TableCell>
+                    <Button
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/application/${application.user.id}`
+                        )
+                      }
+                    >
+                      <Search />
+                    </Button>
+                  </TableCell>
                   <TableCell>
                     {application.status === "pending" && (
                       <div className="flex gap-2">

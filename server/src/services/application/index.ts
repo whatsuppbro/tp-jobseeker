@@ -5,6 +5,36 @@ import { ApplicationType } from "@/db/models/application";
 
 export const getApplications = async () => {
   const applications = await db.query.application.findMany({
+    with: {
+      job: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          company: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
+      user: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          seeker: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -16,6 +46,28 @@ export const getApplications = async () => {
 export const getApplicationsById = async (id: string) => {
   const applications = await db.query.application.findFirst({
     where: eq(table.application.id, id),
+    with: {
+      job: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          company: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
+      user: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+      },
+    },
     columns: {
       created_at: false,
       updated_at: false,

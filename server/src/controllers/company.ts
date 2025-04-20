@@ -56,17 +56,13 @@ export const companyController = new Elysia({
       `/`,
       async ({ body }) => {
         try {
-          const parsedBody = CompanyModel.parse(body);
-          const company = await createCompany(parsedBody);
+          const company = await createCompany({ ...body });
           return SuccessHandler(company);
         } catch (error) {
           return ErrorHandler(error);
         }
       },
       {
-        params: t.Object({
-          id: t.String(),
-        }),
         body: CompanyModel,
       }
     )
@@ -75,17 +71,13 @@ export const companyController = new Elysia({
       `/:id`,
       async ({ params, body }) => {
         try {
-          const parsedBody = CompanyModel.parse(body);
-          const company = await createCompanyByUserId(params.id, parsedBody);
+          const company = await createCompanyByUserId(params.id, { ...body });
           return SuccessHandler(company);
         } catch (error) {
           return ErrorHandler(error);
         }
       },
       {
-        params: t.Object({
-          id: t.String(),
-        }),
         body: CompanyModel,
       }
     )
