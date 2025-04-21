@@ -54,12 +54,12 @@ export default function CertificateModal({ seekerId }: { seekerId: string }) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {seekerId ? (
-          <button className="text-blue-600 hover:underline flex items-center gap-1  cursor-pointer ml-2 text-sm">
+        {seekerId && !certificateName ? (
+          <Button>Add Certificate</Button>
+        ) : (
+          <button className="text-blue-600 hover:underline flex items-center gap-1 cursor-pointer ml-2 text-sm">
             <Edit size={16} /> Edit
           </button>
-        ) : (
-          <Button>Add Certificate</Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

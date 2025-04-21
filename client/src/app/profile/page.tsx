@@ -106,15 +106,29 @@ export default function Profile() {
     fetchUserData();
   }, [router]);
 
-  useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      if (parsedUser.role === "company") {
-        redirect("/details");
-      }
-    }
-  }, [router]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!user?.seeker) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-6 bg-gray-50">
+        <h1 className="text-4xl font-extrabold text-center">
+          Welcome to JobTP
+        </h1>
+        <p className="max-w-md text-center text-gray-600">
+          Add Personal Information to view profile.
+        </p>
+        <Button onClick={() => router.push("/profile/edit")} size="lg">
+          Edit Personal Information
+        </Button>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
