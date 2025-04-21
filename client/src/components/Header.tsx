@@ -98,7 +98,7 @@ export default function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => router.push("/settings")}>
+                <DropdownMenuItem onClick={() => router.push("/setting")}>
                   Setting
                 </DropdownMenuItem>
 
@@ -159,7 +159,7 @@ export default function Header() {
               <Separator />
               {isLoggedIn ? (
                 <>
-                  <DropdownMenuItem onClick={() => router.push("/settings")}>
+                  <DropdownMenuItem onClick={() => router.push("/setting")}>
                     Setting
                   </DropdownMenuItem>
                   {user?.role === "seeker" && (

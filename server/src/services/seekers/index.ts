@@ -9,6 +9,11 @@ export const getSeekers = async () => {
       created_at: false,
       updated_at: false,
     },
+    with: {
+      experience: true,
+      skills: true,
+      education: true,
+    },
   });
 
   return seekers;
@@ -17,6 +22,10 @@ export const getSeekers = async () => {
 export const getSeekerById = async (id: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.id, id),
+    with: {
+      experience: true,
+      skills: true,
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -31,6 +40,10 @@ export const getSeekerById = async (id: string) => {
 export const getSeekerByUserId = async (userId: string) => {
   const seeker = await db.query.seeker.findFirst({
     where: eq(table.seeker.user_id, userId),
+    with: {
+      experience: true,
+      skills: true,
+    },
     columns: {
       created_at: false,
       updated_at: false,
@@ -44,6 +57,14 @@ export const getSeekerByUserId = async (userId: string) => {
 
 export const createSeeker = async (body: SeekerType) => {
   const newSeeker = await db.insert(table.seeker).values(body);
+
+  return newSeeker;
+};
+
+export const createSeekerWithUserId = async (userId: string) => {
+  const newSeeker = await db.insert(table.seeker).values({ user_id: userId });
+
+  if (!newSeeker) throw new Error("Seeker not found");
 
   return newSeeker;
 };

@@ -1,6 +1,6 @@
-import { pgTable, text, uuid, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { seeker, experience, company } from ".";
+import { seeker, company, application } from ".";
 
 export const user = pgTable("user", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -8,7 +8,7 @@ export const user = pgTable("user", {
   lastname: text("lastname").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull().notNull(),
+  role: text("role", { enum: ["seeker", "company"] }).notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at")
     .defaultNow()
@@ -21,12 +21,9 @@ export const userRelations = relations(user, ({ one, many }) => ({
     fields: [user.id],
     references: [seeker.user_id],
   }),
-  experience: one(experience, {
-    fields: [user.id],
-    references: [experience.user_id],
-  }),
   company: one(company, {
     fields: [user.id],
     references: [company.user_id],
   }),
+  applications: many(application),
 }));

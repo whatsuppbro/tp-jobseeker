@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/button";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 interface User {
   id: string;
   email: string;
@@ -18,6 +19,7 @@ interface User {
     company_address: string;
     company_city: string;
     company_country: string;
+    image_url?: string;
   };
 }
 
@@ -33,6 +35,7 @@ export default function EditDetails() {
     company_address: "",
     company_city: "",
     company_country: "",
+    image_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +83,7 @@ export default function EditDetails() {
             company_address: completeUserData.company?.company_address || "",
             company_city: completeUserData.company?.company_city || "",
             company_country: completeUserData.company?.company_country || "",
+            image_url: completeUserData.company?.image_url || "",
           });
         }
       } catch (err: any) {
@@ -198,7 +202,7 @@ export default function EditDetails() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <ProfileSection title="Company Information">
             <InfoRow label="Company Name">
-              <input
+              <Input
                 type="text"
                 name="company_name"
                 value={formData.company_name}
@@ -207,8 +211,19 @@ export default function EditDetails() {
                 className="w-full p-2 border rounded-md"
               />
             </InfoRow>
+            <InfoRow label="Company Logo">
+              <Input
+                type="text"
+                name="image_url"
+                value={formData.image_url}
+                onChange={handleChange}
+                placeholder="Enter your company logo"
+                className="w-full p-2 border rounded-md"
+              />
+            </InfoRow>
+
             <InfoRow label="Description">
-              <textarea
+              <Textarea
                 name="company_description"
                 value={formData.company_description}
                 onChange={handleChange}
@@ -217,7 +232,7 @@ export default function EditDetails() {
               />
             </InfoRow>
             <InfoRow label="Website">
-              <input
+              <Input
                 type="text"
                 name="company_website"
                 value={formData.company_website}
@@ -226,8 +241,9 @@ export default function EditDetails() {
                 className="w-full p-2 border rounded-md"
               />
             </InfoRow>
+
             <InfoRow label="Email">
-              <input
+              <Input
                 type="email"
                 name="company_email"
                 value={formData.company_email}
@@ -237,7 +253,7 @@ export default function EditDetails() {
               />
             </InfoRow>
             <InfoRow label="Phone Number">
-              <input
+              <Input
                 type="tel"
                 name="company_phone"
                 value={formData.company_phone}
@@ -247,7 +263,7 @@ export default function EditDetails() {
               />
             </InfoRow>
             <InfoRow label="Address">
-              <input
+              <Input
                 type="text"
                 name="company_address"
                 value={formData.company_address}
@@ -257,7 +273,7 @@ export default function EditDetails() {
               />
             </InfoRow>
             <InfoRow label="City">
-              <input
+              <Input
                 type="text"
                 name="company_city"
                 value={formData.company_city}
@@ -267,7 +283,7 @@ export default function EditDetails() {
               />
             </InfoRow>
             <InfoRow label="Country">
-              <input
+              <Input
                 type="text"
                 name="company_country"
                 value={formData.company_country}

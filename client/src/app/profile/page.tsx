@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface User {
   id: string;
@@ -9,18 +10,37 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  skill?: string[];
-  experience?: {
-    company_name?: string;
-    position?: string;
-    description?: string;
-    skill?: { name: string }[];
-  };
+  applications?: [
+    {
+      id: string;
+      job_id: string;
+      status: "pending" | "accepted" | "rejected";
+      job?: {
+        id: string;
+        title: string;
+        description: string;
+        location: string;
+        salary: string;
+        job_type: string;
+      };
+    }
+  ];
   seeker: {
     phonenumber?: string;
     address?: string;
     city?: string;
     resume_url?: string;
+    avatar_url?: string;
+    experience?: {
+      company_name?: string;
+      position?: string;
+      experience_years?: string;
+      description?: string;
+    };
+    skills?: {
+      id?: string;
+      name?: string;
+    }[];
   };
   company_name?: string;
   position?: string;
@@ -136,17 +156,36 @@ export default function Profile() {
           <h1 className="text-3xl font-bold">
             Welcome back, <span className="capitalize">{displayName}</span>!
           </h1>
-          <Button
-            onClick={() => router.push("/profile/edit")}
-            variant="outline"
-          >
-            Edit Profile
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/profile/edit")}
+              variant="outline"
+            >
+              Edit Profile
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <ProfileSection title="Personal Information">
+              <div className="mb-4 flex justify-center items-center">
+                <InfoRow
+                  label=""
+                  value={
+                    user.seeker?.avatar_url ? (
+                      <img
+                        src={user.seeker.avatar_url}
+                        alt="Avatar"
+                        className="w-40 h-40 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                      />
+                    ) : (
+                      "Image not found"
+                    )
+                  }
+                />
+              </div>
+
               <InfoRow
                 label="Full Name"
                 value={displayName || "Not provided"}
@@ -154,20 +193,20 @@ export default function Profile() {
               <InfoRow label="Email Address" value={user.email} />
               <InfoRow
                 label="Phone Number"
-                value={user.seeker.phonenumber || "Not provided"}
+                value={user.seeker?.phonenumber || "Not provided"}
               />
               <InfoRow
                 label="Address"
-                value={user.seeker.address || "Not provided"}
+                value={user.seeker?.address || "Not provided"}
               />
               <InfoRow
                 label="City"
-                value={user.seeker.city || "Not provided"}
+                value={user.seeker?.city || "Not provided"}
               />
               <InfoRow
                 label="Resume"
                 value={
-                  user.seeker.resume_url ? (
+                  user.seeker?.resume_url ? (
                     <a
                       href={user.seeker.resume_url}
                       target="_blank"
@@ -182,15 +221,17 @@ export default function Profile() {
                 }
               />
             </ProfileSection>
-
             <ProfileSection title="Skills & Experience">
               <InfoRow
                 label="Skills"
                 value={
-                  user.experience?.skill?.length ? (
+                  user.seeker?.skills?.length ? (
                     <div className="flex flex-wrap gap-2">
-                      {user.experience.skill.map((skill) => (
-                        <span key={skill.name} className="badge">
+                      {user.seeker.skills.map((skill) => (
+                        <span
+                          key={skill.id}
+                          className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-300 ease-in-out"
+                        >
                           {skill.name}
                         </span>
                       ))}
@@ -200,33 +241,116 @@ export default function Profile() {
                   )
                 }
               />
+
               <InfoRow
                 label="Experience"
                 value={
-                  user.experience?.company_name || "No experience added yet"
+                  user.seeker?.experience?.company_name ||
+                  "No experience added yet"
                 }
               />
               <InfoRow
-                label="Position"
-                value={user.experience?.position || "No position added yet"}
+                label="Year active"
+                value={
+                  user.seeker?.experience?.experience_years ||
+                  "No experience added yet"
+                }
               />
+
+              <InfoRow
+                label="Position"
+                value={
+                  user.seeker?.experience?.position || "No position added yet"
+                }
+              />
+
               <InfoRow
                 label="Description"
                 value={
-                  user.experience?.description || "No description added yet"
+                  user.seeker?.experience?.description ||
+                  "No description added yet"
                 }
               />
+              <div className="flex justify-end w-full mt-4 sm:mt-0">
+                <Button
+                  className="w-full sm:w-auto"
+                  onClick={() => router.push("/profile/experience/")}
+                >
+                  Experience Setups
+                </Button>
+              </div>
             </ProfileSection>
           </div>
 
           <div className="lg:col-span-1 space-y-6">
             <ProfileSection title="Applications">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 mb-4">
-                  You haven't applied to any jobs yet.
-                </p>
-                <Button onClick={() => router.push("/jobs")}>
-                  Browse Jobs
+              {user.applications && user.applications.length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Applications</h3>
+                  {user.applications
+                    .filter(
+                      (application) =>
+                        application.status === "accepted" ||
+                        application.status === "pending"
+                    )
+                    .map((application) => (
+                      <Link
+                        key={application.id}
+                        href={`/job/${application.job_id}`}
+                        className="block p-4 bg-gray-50 rounded-lg shadow-md hover:bg-gray-100 transition"
+                      >
+                        <h3 className="text-lg font-semibold">
+                          {application.job?.title || "Job Title Not Available"}
+                        </h3>
+                        <p className="text-gray-600">
+                          {application.job?.description || "No description"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Status:{" "}
+                          <span
+                            className={
+                              application.status === "accepted"
+                                ? "text-green-500"
+                                : "text-yellow-500"
+                            }
+                          >
+                            {application.status.charAt(0).toUpperCase() +
+                              application.status.slice(1)}
+                          </span>
+                        </p>
+                      </Link>
+                    ))}
+                  {user.applications.filter(
+                    (app) =>
+                      app.status === "accepted" || app.status === "pending"
+                  ).length === 0 && (
+                    <p className="text-gray-500 text-center">
+                      No applications to display.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center p-4  rounded-lg">
+                  <p className="text-gray-500 mb-4">
+                    You haven't applied to any jobs yet.
+                  </p>
+                  <Button onClick={() => router.push("/job")}>
+                    Browse Jobs
+                  </Button>
+                </div>
+              )}
+              <div className="flex justify-between mt-4">
+                <Button
+                  onClick={() => router.push("/applied-jobs")}
+                  variant="outline"
+                >
+                  Applied Jobs
+                </Button>
+                <Button
+                  onClick={() => router.push("/saved-jobs")}
+                  variant="outline"
+                >
+                  Saved Jobs
                 </Button>
               </div>
             </ProfileSection>
@@ -276,11 +400,11 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
-  if (user.experience?.skill?.length) completeFields++;
-  if (user.experience?.company_name) completeFields++;
-  if (user.seeker.phonenumber) completeFields++;
-  if (user.seeker.address) completeFields++;
-  if (user.seeker.city) completeFields++;
-  if (user.seeker.resume_url) completeFields++;
+  if (user.seeker?.skills?.length) completeFields++;
+  if (user.seeker?.experience?.company_name) completeFields++;
+  if (user.seeker?.phonenumber) completeFields++;
+  if (user.seeker?.address) completeFields++;
+  if (user.seeker?.city) completeFields++;
+  if (user.seeker?.resume_url) completeFields++;
   return Math.round((completeFields / 8) * 100);
 }

@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,29 +14,33 @@ import useDebounce from "./useDebounce";
 import Combobox from "../Combobox";
 
 interface SearchFilterProps {
-  categories: string[];
+  jobTypes: string[];
   locations: string[];
   onSearch: (filters: {
     keyword: string;
-    category: string;
+    jobType: string;
     location: string;
   }) => void;
 }
 
 export default function SearchFilter({
-  categories,
+  jobTypes,
   locations,
   onSearch,
 }: SearchFilterProps) {
   const [keyword, setKeyword] = useState("");
-  const [category, setCategory] = useState("");
-  const [location, setLocation] = useState("");
+  const [jobType, setJobType] = useState("All");
+  const [location, setLocation] = useState("All");
 
   const debouncedKeyword = useDebounce(keyword, 500);
 
   const handleSearch = () => {
-    onSearch({ keyword: debouncedKeyword, category, location });
+    onSearch({ keyword: debouncedKeyword, jobType, location });
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [debouncedKeyword]);
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full max-w-6xl mx-auto p-4">
@@ -55,17 +58,20 @@ export default function SearchFilter({
       </div>
 
       <div className="flex-1">
-        <Label htmlFor="category" className="block mb-2 text-sm font-medium">
-          Filter by Category
+        <Label htmlFor="jobType" className="block mb-2 text-sm font-medium">
+          Filter by Job Type
         </Label>
-        <Select value={category} onValueChange={(value) => setCategory(value)}>
+        <Select value={jobType} onValueChange={(value) => setJobType(value)}>
           <SelectTrigger className="w-full bg-white flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground">
-            <SelectValue placeholder="Select a category..." />
+            <SelectValue placeholder="Select a job type..." />
           </SelectTrigger>
           <SelectContent>
-            {categories.map((cat, index) => (
-              <SelectItem key={index} value={cat}>
-                {cat}
+            <SelectItem key="all-jobType" value="All">
+              All
+            </SelectItem>
+            {jobTypes.map((type, index) => (
+              <SelectItem key={index} value={type}>
+                {type}
               </SelectItem>
             ))}
           </SelectContent>
@@ -73,13 +79,13 @@ export default function SearchFilter({
       </div>
 
       <div className="flex-1">
-        <Label htmlFor="location" className=" block mb-2 text-sm font-medium">
+        <Label htmlFor="location" className="block mb-2 text-sm font-medium">
           Filter by Location
         </Label>
         <Combobox
           value={location}
           onValueChange={(value) => setLocation(value)}
-          options={locations}
+          options={["All", ...locations]}
           placeholder="Enter a location..."
         />
       </div>

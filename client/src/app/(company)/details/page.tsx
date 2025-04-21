@@ -9,15 +9,16 @@ interface User {
   firstname?: string;
   lastname?: string;
   role: "seeker" | "company";
-  company: {
-    company_name: string;
-    company_description: string;
-    company_website: string;
-    company_email: string;
-    company_phone: string;
-    company_address: string;
-    company_city: string;
-    company_country: string;
+  company?: {
+    company_name?: string;
+    company_description?: string;
+    company_website?: string;
+    company_email?: string;
+    company_phone?: string;
+    company_address?: string;
+    company_city?: string;
+    company_country?: string;
+    image_url?: string;
   };
 }
 
@@ -152,6 +153,22 @@ export default function Details() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <ProfileSection title="Company Information">
+              <div className="mb-4 flex justify-center items-center">
+                <InfoRow
+                  label=""
+                  value={
+                    user.company?.image_url ? (
+                      <img
+                        src={user.company.image_url}
+                        alt="image"
+                        className="w-40 h-40 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                      />
+                    ) : (
+                      "Image not found"
+                    )
+                  }
+                />
+              </div>
               <InfoRow
                 label="Company Name"
                 value={user.company?.company_name || "Company name"}
@@ -175,19 +192,36 @@ export default function Details() {
               />
               <InfoRow
                 label="Company Phone Number"
-                value={user.company?.company_phone || "Not provided"}
+                value={user?.company?.company_phone || "Not provided"}
               />
               <InfoRow
                 label="Company Address"
-                value={user.company?.company_address || "Not provided"}
+                value={user?.company?.company_address || "Not provided"}
               />
               <InfoRow
                 label="Company City"
-                value={user.company?.company_city || "Not provided"}
+                value={user?.company?.company_city || "Not provided"}
               />
               <InfoRow
                 label="Company Country"
-                value={user.company?.company_country || "Not provided"}
+                value={user?.company?.company_country || "Not provided"}
+              />
+              <InfoRow
+                label="Company Website"
+                value={
+                  user?.company?.company_website ? (
+                    <a
+                      href={user.company?.company_website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Website
+                    </a>
+                  ) : (
+                    "Not provided"
+                  )
+                }
               />
             </ProfileSection>
           </div>
@@ -237,10 +271,10 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
 
 function calculateProfileCompleteness(user: User): number {
   let completeFields = 1;
-  if (user.company.company_address) completeFields++;
-  if (user.company.company_phone) completeFields++;
-  if (user.company.company_address) completeFields++;
-  if (user.company.company_city) completeFields++;
-  if (user.company.company_description) completeFields++;
+  if (user?.company?.company_address) completeFields++;
+  if (user?.company?.company_phone) completeFields++;
+  if (user?.company?.company_address) completeFields++;
+  if (user?.company?.company_city) completeFields++;
+  if (user?.company?.company_description) completeFields++;
   return Math.round((completeFields / 6) * 100);
 }

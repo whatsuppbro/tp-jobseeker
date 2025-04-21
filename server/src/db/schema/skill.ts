@@ -1,13 +1,12 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
+import { seeker } from "./seekers";
 import { relations } from "drizzle-orm";
-import { experience } from "./experience";
 
 export const skill = pgTable("skill", {
   id: uuid("id").primaryKey().defaultRandom(),
-  experience_id: uuid("experience_id")
-    .references(() => experience.id)
-    .notNull()
-    .unique(),
+  seeker_id: uuid("seeker_id")
+    .references(() => seeker.id)
+    .notNull(),
   name: text("name").notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at")
@@ -17,8 +16,8 @@ export const skill = pgTable("skill", {
 });
 
 export const skillRelations = relations(skill, ({ one }) => ({
-  experience: one(experience, {
-    fields: [skill.experience_id],
-    references: [experience.id],
+  seeker: one(seeker, {
+    fields: [skill.seeker_id],
+    references: [seeker.id],
   }),
 }));

@@ -2,6 +2,7 @@ import { t } from "elysia";
 
 export const CompanyModel = t.Object({
   user_id: t.String({ error: "User ID is required" }),
+  image_url: t.String(),
   company_name: t.String({ error: "Company name is required" }),
   company_description: t.Optional(t.String()),
   company_website: t.Optional(t.String()),

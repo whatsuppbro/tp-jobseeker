@@ -17,6 +17,20 @@ export const getUsers = async () => {
 export const getUserById = async (id: string) => {
   const user = await db.query.user.findFirst({
     with: {
+      applications: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          job: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+        },
+      },
       company: {
         columns: {
           created_at: false,
@@ -28,19 +42,25 @@ export const getUserById = async (id: string) => {
           created_at: false,
           updated_at: false,
         },
-      },
-      experience: {
         with: {
-          skill: {
+          experience: {
             columns: {
               created_at: false,
               updated_at: false,
             },
           },
-        },
-        columns: {
-          created_at: false,
-          updated_at: false,
+          skills: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
+          education: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
         },
       },
     },
