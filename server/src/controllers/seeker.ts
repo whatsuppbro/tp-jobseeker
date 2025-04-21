@@ -6,13 +6,22 @@ import {
   createSeeker,
   createSeekerWithUserId,
   updateSeeker,
-  deleteSeeker,
 } from "@/services/seekers";
-import { getSkillBySeeker, updateSkill } from "@/services/seekers/skill";
+import {
+  getSkillBySeeker,
+  updateSkill,
+  createSkillBySeekerId,
+} from "@/services/seekers/skill";
 import { SeekerModel } from "@/db/models/seekers";
 import { SkillModel } from "@/db/models/skill";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
-
+import {
+  getEducationBySeeker,
+  createEducationBySeekerId,
+  updateEducation,
+} from "@/services/seekers/education";
+import { EducationModel } from "@/db/models/education";
+import { education } from "@/db/schema";
 const controller = "seeker";
 
 export const seekerController = new Elysia({
@@ -127,4 +136,68 @@ export const seekerController = new Elysia({
         return ErrorHandler(error);
       }
     })
+    .post(
+      `/skill/:id`,
+      async ({ params, body }) => {
+        try {
+          const seeker = await createSkillBySeekerId(params.id, { ...body });
+          if (!seeker) {
+            throw new Error("Seeker not found");
+          }
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: SkillModel,
+      }
+    )
+    .post(
+      `/education/:id`,
+      async ({ params, body }) => {
+        try {
+          const seeker = await createEducationBySeekerId(params.id, {
+            ...body,
+          });
+          if (!seeker) {
+            throw new Error("Seeker not found");
+          }
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: EducationModel,
+      }
+    )
+    .get(`/education/:id`, async ({ params }) => {
+      try {
+        const seeker = await getEducationBySeeker(params.id);
+        if (!seeker) {
+          throw new Error("Seeker not found");
+        }
+        return SuccessHandler(seeker);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+    .put(
+      "/education/:id",
+      async ({ params, body }) => {
+        try {
+          const seeker = await updateEducation(params.id, { ...body });
+          if (!seeker) {
+            throw new Error("Seeker not found");
+          }
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: EducationModel,
+      }
+    )
 );

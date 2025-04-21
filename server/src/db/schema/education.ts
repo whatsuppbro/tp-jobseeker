@@ -2,12 +2,17 @@ import { pgTable, uuid, text, timestamp } from "drizzle-orm/pg-core";
 import { seeker } from "./seekers";
 import { relations } from "drizzle-orm";
 
-export const skill = pgTable("skill", {
+export const education = pgTable("education", {
   id: uuid("id").primaryKey().defaultRandom(),
   seeker_id: uuid("seeker_id")
     .references(() => seeker.id)
-    .notNull(),
-  name: text("name").notNull(),
+    .notNull()
+    .unique(),
+  school_name: text("school_name").notNull(),
+  degree: text("degree").notNull(),
+  field_of_study: text("field_of_study"),
+  start_date: text("start_date"),
+  end_date: text("end_date"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at")
     .defaultNow()
@@ -15,9 +20,9 @@ export const skill = pgTable("skill", {
     .$onUpdate(() => new Date()),
 });
 
-export const skillRelations = relations(skill, ({ one }) => ({
+export const educationRelations = relations(education, ({ one }) => ({
   seeker: one(seeker, {
-    fields: [skill.seeker_id],
+    fields: [education.seeker_id],
     references: [seeker.id],
   }),
 }));

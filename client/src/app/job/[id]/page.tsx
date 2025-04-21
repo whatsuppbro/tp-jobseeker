@@ -24,6 +24,7 @@ interface Job {
     company_address: string;
     company_city: string;
     company_country: string;
+    image_url: string;
   };
   applications: {
     id: string;

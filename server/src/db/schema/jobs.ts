@@ -13,6 +13,7 @@ export const jobs = pgTable("jobs", {
   location: text("location").notNull(),
   salary: text("salary").notNull(),
   job_type: text("job_type").notNull(),
+  image_url: text("image_url"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at")
     .defaultNow()

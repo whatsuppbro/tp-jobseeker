@@ -110,13 +110,9 @@ export const experienceController = new Elysia({
       "/seeker/:id",
       async ({ params, body }) => {
         try {
-          const experience = await createExperienceWithSeekerId(
-            params.id,
-            body.company_name,
-            body.position,
-            body.experience_years,
-            body.description
-          );
+          const experience = await createExperienceWithSeekerId(params.id, {
+            ...body,
+          });
           return SuccessHandler(experience);
         } catch (error) {
           return ErrorHandler(error);

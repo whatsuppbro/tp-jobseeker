@@ -5,6 +5,7 @@ export const SeekerModel = t.Object({
   phonenumber: t.String(),
   address: t.String(),
   city: t.String(),
+  avatar_url: t.String(),
   resume_url: t.String(),
 });
 

@@ -18,6 +18,7 @@ interface User {
     company_address?: string;
     company_city?: string;
     company_country?: string;
+    image_url?: string;
   };
 }
 
@@ -152,6 +153,22 @@ export default function Details() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <ProfileSection title="Company Information">
+              <div className="mb-4 flex justify-center items-center">
+                <InfoRow
+                  label=""
+                  value={
+                    user.company?.image_url ? (
+                      <img
+                        src={user.company.image_url}
+                        alt="image"
+                        className="w-40 h-40 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                      />
+                    ) : (
+                      "Image not found"
+                    )
+                  }
+                />
+              </div>
               <InfoRow
                 label="Company Name"
                 value={user.company?.company_name || "Company name"}
@@ -188,6 +205,23 @@ export default function Details() {
               <InfoRow
                 label="Company Country"
                 value={user?.company?.company_country || "Not provided"}
+              />
+              <InfoRow
+                label="Company Website"
+                value={
+                  user?.company?.company_website ? (
+                    <a
+                      href={user.company?.company_website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Website
+                    </a>
+                  ) : (
+                    "Not provided"
+                  )
+                }
               />
             </ProfileSection>
           </div>

@@ -9,6 +9,7 @@ export const company = pgTable("company", {
     .references(() => user.id)
     .notNull()
     .unique(),
+  image_url: text("image_url"),
   company_name: text("company_name").notNull(),
   company_description: text("company_description"),
   company_website: text("company_website"),

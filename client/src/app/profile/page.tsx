@@ -30,6 +30,7 @@ interface User {
     address?: string;
     city?: string;
     resume_url?: string;
+    avatar_url?: string;
     experience?: {
       company_name?: string;
       position?: string;
@@ -168,6 +169,23 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
             <ProfileSection title="Personal Information">
+              <div className="mb-4 flex justify-center items-center">
+                <InfoRow
+                  label=""
+                  value={
+                    user.seeker?.avatar_url ? (
+                      <img
+                        src={user.seeker.avatar_url}
+                        alt="Avatar"
+                        className="w-40 h-40 rounded-full object-cover border-2 border-gray-300 shadow-sm"
+                      />
+                    ) : (
+                      "Image not found"
+                    )
+                  }
+                />
+              </div>
+
               <InfoRow
                 label="Full Name"
                 value={displayName || "Not provided"}

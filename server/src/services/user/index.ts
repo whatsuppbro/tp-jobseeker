@@ -55,6 +55,12 @@ export const getUserById = async (id: string) => {
               updated_at: false,
             },
           },
+          education: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+          },
         },
       },
     },

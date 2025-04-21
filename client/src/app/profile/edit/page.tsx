@@ -19,6 +19,7 @@ interface User {
     address?: string;
     city?: string;
     resume_url?: string;
+    avatar_url?: string;
   };
 }
 
@@ -30,6 +31,7 @@ const SeekerFormSchema = z.object({
   address: z.string(),
   city: z.string(),
   resume_url: z.union([z.string().url(), z.literal("")]).optional(),
+  avatar_url: z.union([z.string().url(), z.literal("")]).optional(),
 });
 
 export default function EditProfile() {
@@ -113,6 +115,7 @@ export default function EditProfile() {
         address: user.seeker?.address || "",
         city: user.seeker?.city || "",
         resume_url: user.seeker?.resume_url || "",
+        avatar_url: user.seeker?.avatar_url || "",
       };
 
       const seekerValidation = SeekerFormSchema.safeParse(seekerFormData);
@@ -136,6 +139,7 @@ export default function EditProfile() {
               address: user.seeker.address,
               city: user.seeker.city,
               resume_url: user.seeker.resume_url,
+              avatar_url: user.seeker.avatar_url,
             }),
           }
         );
@@ -153,6 +157,7 @@ export default function EditProfile() {
               address: user.seeker?.address,
               city: user.seeker?.city,
               resume_url: user.seeker?.resume_url,
+              avatar_url: user.seeker?.avatar_url,
             }),
           }
         );
@@ -272,6 +277,17 @@ export default function EditProfile() {
                     name="seeker.city"
                     value={user?.seeker?.city || ""}
                     onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">
+                    Avatar URL
+                  </label>
+                  <Input
+                    name="seeker.avatar_url"
+                    value={user?.seeker?.avatar_url || ""}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/avatar.jpg"
                   />
                 </div>
                 <div>

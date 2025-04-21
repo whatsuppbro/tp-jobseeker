@@ -9,6 +9,11 @@ export const getSeekers = async () => {
       created_at: false,
       updated_at: false,
     },
+    with: {
+      experience: true,
+      skills: true,
+      education: true,
+    },
   });
 
   return seekers;
