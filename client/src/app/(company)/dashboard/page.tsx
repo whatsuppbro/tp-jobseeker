@@ -191,9 +191,17 @@ export default function Dashboard() {
           <p>
             <strong>Description:</strong> {company.company_description}
           </p>
-          <p>
-            <strong>Website:</strong> {company.company_website}
-          </p>
+          <div>
+            <strong>Website:</strong>
+            <a
+              href={company.company_website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline ml-2"
+            >
+              View Website
+            </a>
+          </div>
           <p>
             <strong>Email:</strong> {company.company_email}
           </p>

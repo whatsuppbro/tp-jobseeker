@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,12 +27,16 @@ export default function SkillsModal({
   const [skillName, setSkillName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [skills, setSkills] =
-    useState<{ id: string; name: string }[]>(receivedSkills);
 
-  useEffect(() => {
-    setSkills(receivedSkills);
-  }, [receivedSkills]);
+  const memoizedSkills = useMemo(() => receivedSkills, [receivedSkills]);
+
+  if (!seekerId) {
+    return (
+      <div className="text-red-500">
+        Personal Information is required to manage skills.
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,12 +58,12 @@ export default function SkillsModal({
       if (!response.ok) throw new Error("Failed to save skill");
 
       const newSkill = await response.json();
-      setSkills((prev) => [...prev, newSkill]);
+      onSkillUpdated?.();
       toast.success(hasSkills ? "Skill updated!" : "Skill added!");
       setIsOpen(false);
       setSkillName("");
-      onSkillUpdated?.();
     } catch (error) {
+      console.error(error);
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -78,10 +81,10 @@ export default function SkillsModal({
 
       if (!response.ok) throw new Error("Failed to delete skill");
 
-      setSkills((prev) => prev.filter((skill) => skill.id !== skillId));
-      toast.success("Skill deleted successfully");
       onSkillUpdated?.();
+      toast.success("Skill deleted successfully");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to delete skill. Please try again.");
     } finally {
       setIsLoading(false);
@@ -92,7 +95,7 @@ export default function SkillsModal({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {hasSkills ? (
-          <button className=" text-blue-600 hover:underline flex items-center gap-1  cursor-pointer ml-2 text-sm">
+          <button className="text-blue-600 hover:underline flex items-center gap-1 cursor-pointer ml-2 text-sm">
             <Edit size={16} /> Edit
           </button>
         ) : (
@@ -106,15 +109,16 @@ export default function SkillsModal({
 
         {hasSkills && (
           <div className="max-h-48 overflow-y-auto mb-4">
-            {skills.map((skill, index) => (
+            {memoizedSkills.map((skill, index) => (
               <div
-                key={`${skill.id}-${index}`}
+                key={`${skill?.id}-${index}`}
                 className="flex justify-between items-center p-2 border rounded mb-2"
               >
-                <span>{skill.name}</span>
+                <span>{skill?.name}</span>
                 <Trash2Icon
                   className="w-4 h-4 text-red-500 cursor-pointer"
-                  onClick={() => handleDelete(skill.id)}
+                  onClick={() => handleDelete(skill?.id)}
+                  aria-label={`Delete skill: ${skill?.name}`}
                 />
               </div>
             ))}
@@ -126,9 +130,14 @@ export default function SkillsModal({
             placeholder="Enter a skill"
             value={skillName}
             onChange={(e) => setSkillName(e.target.value)}
-            disabled={isLoading}
+            disabled={isLoading || !seekerId}
+            aria-label="Skill name input"
           />
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            disabled={isLoading || !seekerId || !skillName.trim()}
+            aria-disabled={isLoading || !seekerId || !skillName.trim()}
+          >
             {isLoading ? "Saving..." : hasSkills ? "Update" : "Save"}
           </Button>
         </form>

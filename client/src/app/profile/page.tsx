@@ -29,7 +29,7 @@ interface User {
       };
     }
   ];
-  seeker: {
+  seeker?: {
     id: string;
     phonenumber?: string;
     address?: string;
@@ -190,7 +190,7 @@ export default function Profile() {
                   value={
                     user.seeker?.avatar_url ? (
                       <img
-                        src={user.seeker.avatar_url}
+                        src={user.seeker?.avatar_url}
                         alt="Avatar"
                         className="w-40 h-40 rounded-full object-cover border-2 border-gray-300 shadow-sm"
                       />
@@ -223,7 +223,7 @@ export default function Profile() {
                 value={
                   user.seeker?.resume_url ? (
                     <a
-                      href={user.seeker.resume_url}
+                      href={user.seeker?.resume_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
@@ -251,24 +251,22 @@ export default function Profile() {
                             {skill.name}
                           </span>
                         ))}
-                        <div className="flex justify-start w-full">
-                          <SkillsModal
-                            seekerId={user.seeker.id}
-                            hasSkills={true}
-                            skills={
-                              user.seeker.skills?.filter(
-                                (skill) => skill.id && skill.name
-                              ) as { id: string; name: string }[]
-                            }
-                          />
-                        </div>
+                        <SkillsModal
+                          seekerId={user.seeker?.id}
+                          hasSkills={true}
+                          skills={
+                            user.seeker?.skills?.filter(
+                              (skill) => skill.id && skill.name
+                            ) as { id: string; name: string }[]
+                          }
+                        />
                       </div>
                     ) : (
                       <div className="flex flex-col items-start gap-2">
                         <p className="text-gray-600">
                           Let employers know how valuable you can be to them.
                         </p>
-                        <SkillsModal seekerId={user.seeker.id} />
+                        <SkillsModal seekerId={user.seeker?.id || ""} />
                       </div>
                     )}
                   </>
@@ -279,31 +277,31 @@ export default function Profile() {
                 <>
                   <InfoRow
                     label="Experience"
-                    value={user.seeker.experience.company_name}
+                    value={user.seeker?.experience.company_name}
                   />
                   <InfoRow
                     label="Years Active"
-                    value={user.seeker.experience.experience_years}
+                    value={user.seeker?.experience.experience_years}
                   />
                   <InfoRow
                     label="Position"
-                    value={user.seeker.experience.position}
+                    value={user.seeker?.experience.position}
                   />
                   <InfoRow
                     label="Description"
-                    value={user.seeker.experience.description}
+                    value={user.seeker?.experience.description}
                   />
                   <div className="flex justify-start mt-2">
                     <ExperienceModal
-                      seekerId={user.seeker.id}
+                      seekerId={user.seeker?.id}
                       experience={{
-                        id: user.seeker.experience?.id || "",
+                        id: user.seeker?.experience?.id || "",
                         company_name:
-                          user.seeker.experience?.company_name || "",
-                        position: user.seeker.experience?.position || "",
+                          user.seeker?.experience?.company_name || "",
+                        position: user.seeker?.experience?.position || "",
                         experience_years:
-                          user.seeker.experience?.experience_years || "",
-                        description: user.seeker.experience?.description || "",
+                          user.seeker?.experience?.experience_years || "",
+                        description: user.seeker?.experience?.description || "",
                       }}
                     />
                   </div>
@@ -313,7 +311,7 @@ export default function Profile() {
                   <p className="text-gray-600">
                     Add your professional experience to stand out to employers
                   </p>
-                  <ExperienceModal seekerId={user.seeker.id} />
+                  <ExperienceModal seekerId={user.seeker?.id || ""} />
                 </div>
               )}
               <Separator className="my-4" />
@@ -322,35 +320,35 @@ export default function Profile() {
                 <>
                   <InfoRow
                     label="Education"
-                    value={user.seeker.education.school_name}
+                    value={user.seeker?.education.school_name}
                   />
                   <InfoRow
                     label="Degree"
-                    value={user.seeker.education.degree}
+                    value={user.seeker?.education.degree}
                   />
                   <InfoRow
                     label="Field of Study"
-                    value={user.seeker.education.field_of_study}
+                    value={user.seeker?.education.field_of_study}
                   />
                   <InfoRow
                     label="Start Date"
-                    value={user.seeker.education.start_date}
+                    value={user.seeker?.education.start_date}
                   />
                   <InfoRow
                     label="End Date"
-                    value={user.seeker.education.end_date}
+                    value={user.seeker?.education.end_date}
                   />
                   <div className="flex flex-col items-start gap-2 mt-2">
                     <EducationModal
-                      seekerId={user.seeker.id}
+                      seekerId={user.seeker?.id}
                       education={{
-                        seeker_id: user.seeker.education?.id || "",
-                        school_name: user.seeker.education?.school_name || "",
-                        degree: user.seeker.education?.degree || "",
+                        seeker_id: user.seeker?.education?.id || "",
+                        school_name: user.seeker?.education?.school_name || "",
+                        degree: user.seeker?.education?.degree || "",
                         field_of_study:
-                          user.seeker.education?.field_of_study || "",
-                        start_date: user.seeker.education?.start_date || "",
-                        end_date: user.seeker.education?.end_date || "",
+                          user.seeker?.education?.field_of_study || "",
+                        start_date: user.seeker?.education?.start_date || "",
+                        end_date: user.seeker?.education?.end_date || "",
                       }}
                     />
                   </div>
@@ -362,7 +360,7 @@ export default function Profile() {
                     <br />
                     Tell employers about your education.
                   </p>
-                  <EducationModal seekerId={user.seeker.id} />
+                  <EducationModal seekerId={user.seeker?.id || ""} />
                 </div>
               )}
               <Separator className="my-4" />
@@ -371,10 +369,10 @@ export default function Profile() {
                 <>
                   <InfoRow
                     label="Certificates"
-                    value={user.seeker.certificates}
+                    value={user.seeker?.certificates}
                   />
                   <div className="flex flex-col items-start gap-2 mt-2">
-                    <CertificateModal seekerId={user.seeker.id} />
+                    <CertificateModal seekerId={user.seeker?.id} />
                   </div>
                 </>
               ) : (
@@ -385,7 +383,7 @@ export default function Profile() {
                     Showcase your professional credentials. Add your relevant
                     licences, certificates, memberships and accreditations here.
                   </p>
-                  <CertificateModal seekerId={user.seeker.id} />
+                  <CertificateModal seekerId={user.seeker?.id || ""} />
                 </div>
               )}
             </ProfileSection>

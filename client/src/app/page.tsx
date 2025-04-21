@@ -66,16 +66,28 @@ export default function HomePage() {
               <Link
                 href={`/job/${job.id}`}
                 key={job.id}
-                className="bg-white rounded-lg shadow-md p-6 transition-transform hover:scale-105"
+                className="bg-white rounded-lg shadow-xl p-6 transition-transform duration-200 hover:scale-105 hover:shadow-lg border border-gray-200"
               >
                 <div key={job.id}>
-                  <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-green-950">
+                    {job.title}
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-2">{job.location}</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Salary:{" "}
+                    <span className="font-medium text-green-600">
+                      {job.salary || "Not specified"}
+                    </span>
+                  </p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Company:{" "}
+                    <span className="font-medium text-gray-700">
+                      {job.company?.company_name || "Not specified"}
+                    </span>
+                  </p>
                   <p className="text-gray-600 mb-2 line-clamp-2">
                     {job.description}
-                  </p>
-                  <p className="text-sm text-gray-500">{job.location}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Company: {job.company?.company_name || "Not specified"}
                   </p>
                 </div>
               </Link>

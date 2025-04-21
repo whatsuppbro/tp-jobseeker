@@ -42,6 +42,14 @@ export default function EducationModal({
     end_date: education?.end_date || "",
   });
 
+  if (!seekerId) {
+    return (
+      <div className="text-red-500">
+        Personal Information is required to manage education.
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

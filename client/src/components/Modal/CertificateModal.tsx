@@ -16,6 +16,14 @@ export default function CertificateModal({ seekerId }: { seekerId: string }) {
   const [certificateName, setCertificateName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
+  if (!seekerId) {
+    return (
+      <div className="text-red-500">
+        Personal Information is required to manage certificate.
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

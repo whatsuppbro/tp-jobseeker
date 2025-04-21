@@ -38,6 +38,14 @@ export default function ExperienceModal({
     description: experience?.description || "",
   });
 
+  if (!seekerId) {
+    return (
+      <div className="text-red-500">
+        Personal Information is required to manage experience.
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

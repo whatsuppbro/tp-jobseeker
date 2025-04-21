@@ -84,16 +84,17 @@ export default async function JobDetail({
           </CardHeader>
           <CardContent className="space-y-4">
             <p>{job.company.company_description}</p>
-            <p>
-              <strong>Website:</strong>{" "}
+            <div>
+              <strong>Website:</strong>
               <a
                 href={job.company.company_website}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="text-blue-500 hover:underline ml-2"
               >
-                {job.company.company_website}
+                View Website
               </a>
-            </p>
+            </div>
             <p>
               <strong>Email:</strong> {job.company.company_email}
             </p>
