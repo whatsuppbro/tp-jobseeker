@@ -20,6 +20,19 @@ interface Applicant {
   applied_position: string;
   status: "pending" | "accepted" | "rejected";
   resume_url?: string;
+  address?: string;
+  avatar_url?: string;
+  certificates?: string;
+  city?: string;
+  company_name?: string;
+  description?: string;
+  experience_years?: number;
+  position?: string;
+  degree?: string;
+  fiedl_of_study?: string;
+  school_name?: string;
+  start_date?: string;
+  end_date?: string;
   created_at: string;
 }
 
@@ -32,7 +45,7 @@ export default function Applicants() {
     const fetchApplicants = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/applications`
+          `${process.env.NEXT_PUBLIC_API_URL}/applications/`
         );
 
         if (!response.ok) {
@@ -48,6 +61,25 @@ export default function Applicants() {
           applied_position: application.job.title,
           status: application.status,
           resume_url: application.user.seeker?.resume_url || undefined,
+          address: application.user.seeker?.address || undefined,
+          avatar_url: application.user.seeker?.avatar_url || undefined,
+          certificates: application.user.seeker?.certificates || undefined,
+          school: application.user.seeker?.education?.school_name || undefined,
+          degree: application.user.seeker?.education?.degree || undefined,
+          field_of_study:
+            application.user.seeker?.education?.field_of_study || undefined,
+          start_date:
+            application.user.seeker?.education?.start_date || undefined,
+          end_date: application.user.seeker?.education?.end_date || undefined,
+          company_name:
+            application.user.seeker?.experience?.company_name || undefined,
+          active:
+            application.user.seeker?.experience?.experience_years || undefined,
+          position: application.user.seeker?.experience?.position || undefined,
+          description:
+            application.user.seeker?.experience?.description || undefined,
+          skills: application.user.seeker?.skills?.name || undefined,
+
           created_at: new Date().toISOString(),
         }));
 
@@ -144,7 +176,6 @@ export default function Applicants() {
                 <div>
                   {applicant.resume_url && (
                     <Button
-                      variant="outline"
                       size="sm"
                       className="mt-2"
                       onClick={() =>

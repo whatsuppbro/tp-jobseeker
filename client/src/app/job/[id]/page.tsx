@@ -15,6 +15,7 @@ interface Job {
   location: string;
   salary: string;
   job_type: string;
+  image_url: string;
   company: {
     company_name: string;
     company_description: string;
@@ -56,6 +57,13 @@ export default async function JobDetail({
       <div className="container mx-auto px-4 py-12 space-y-12">
         <Card>
           <CardHeader>
+            <CardTitle className="flex flex-col items-center space-y-4">
+              <img
+                src={job.image_url || "https://picsum.photos/1000"}
+                alt={job.title}
+                className="w-full h-64 object-cover rounded-t-lg"
+              />
+            </CardTitle>
             <CardTitle>{job.title}</CardTitle>
             <CardDescription>
               Location: {job.location} | Salary: {job.salary}

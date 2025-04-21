@@ -49,6 +49,7 @@ export const getJobsByCompanyId = async (companyId: string) => {
 
 export const createJobs = async (data: JobType) => {
   const newJobs = await db.insert(table.jobs).values(data);
+
   return newJobs;
 };
 

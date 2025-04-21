@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PencilRuler, Search, BookOpenCheck } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   const router = useRouter();
@@ -62,17 +63,22 @@ export default function HomePage() {
         ) : featuredJobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredJobs.map((job) => (
-              <div
+              <Link
+                href={`/job/${job.id}`}
                 key={job.id}
                 className="bg-white rounded-lg shadow-md p-6 transition-transform hover:scale-105"
               >
-                <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
-                <p className="text-gray-600 mb-2">{job.description}</p>
-                <p className="text-sm text-gray-500">{job.location}</p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Company: {job.company?.company_name || "Not specified"}
-                </p>
-              </div>
+                <div key={job.id}>
+                  <h3 className="text-xl font-semibold mb-2">{job.title}</h3>
+                  <p className="text-gray-600 mb-2 line-clamp-2">
+                    {job.description}
+                  </p>
+                  <p className="text-sm text-gray-500">{job.location}</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Company: {job.company?.company_name || "Not specified"}
+                  </p>
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
