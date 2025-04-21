@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useRouter, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import { Separator } from "@/components/ui/separator";
+import SkillsModal from "@/components/Modal/SkillsModal";
+import ExperienceModal from "@/components/Modal/ExperienceModal";
+import EducationModal from "@/components/Modal/EducationModal";
+import CertificateModal from "@/components/Modal/CertificateModal";
 interface User {
   id: string;
   email: string;
@@ -26,12 +30,23 @@ interface User {
     }
   ];
   seeker: {
+    id: string;
     phonenumber?: string;
     address?: string;
     city?: string;
     resume_url?: string;
     avatar_url?: string;
+    certificates?: string;
+    education?: {
+      id?: string;
+      school_name?: string;
+      degree?: string;
+      field_of_study?: string;
+      start_date?: string;
+      end_date?: string;
+    };
     experience?: {
+      id?: string;
       company_name?: string;
       position?: string;
       experience_years?: string;
@@ -225,60 +240,154 @@ export default function Profile() {
               <InfoRow
                 label="Skills"
                 value={
-                  user.seeker?.skills?.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {user.seeker.skills.map((skill) => (
-                        <span
-                          key={skill.id}
-                          className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-300 ease-in-out"
-                        >
-                          {skill.name}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    "Not specified"
-                  )
+                  <>
+                    {user.seeker?.skills?.length ? (
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {user.seeker.skills.map((skill) => (
+                          <span
+                            key={skill.id}
+                            className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-300 ease-in-out"
+                          >
+                            {skill.name}
+                          </span>
+                        ))}
+                        <div className="flex justify-start w-full">
+                          <SkillsModal
+                            seekerId={user.seeker.id}
+                            hasSkills={true}
+                            skills={
+                              user.seeker.skills?.filter(
+                                (skill) => skill.id && skill.name
+                              ) as { id: string; name: string }[]
+                            }
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-start gap-2">
+                        <p className="text-gray-600">
+                          Let employers know how valuable you can be to them.
+                        </p>
+                        <SkillsModal seekerId={user.seeker.id} />
+                      </div>
+                    )}
+                  </>
                 }
               />
+              <Separator className="my-4" />
+              {user.seeker?.experience ? (
+                <>
+                  <InfoRow
+                    label="Experience"
+                    value={user.seeker.experience.company_name}
+                  />
+                  <InfoRow
+                    label="Years Active"
+                    value={user.seeker.experience.experience_years}
+                  />
+                  <InfoRow
+                    label="Position"
+                    value={user.seeker.experience.position}
+                  />
+                  <InfoRow
+                    label="Description"
+                    value={user.seeker.experience.description}
+                  />
+                  <div className="flex justify-start mt-2">
+                    <ExperienceModal
+                      seekerId={user.seeker.id}
+                      experience={{
+                        id: user.seeker.experience?.id || "",
+                        company_name:
+                          user.seeker.experience?.company_name || "",
+                        position: user.seeker.experience?.position || "",
+                        experience_years:
+                          user.seeker.experience?.experience_years || "",
+                        description: user.seeker.experience?.description || "",
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-start gap-2 mt-4">
+                  <p className="text-gray-600">
+                    Add your professional experience to stand out to employers
+                  </p>
+                  <ExperienceModal seekerId={user.seeker.id} />
+                </div>
+              )}
+              <Separator className="my-4" />
 
-              <InfoRow
-                label="Experience"
-                value={
-                  user.seeker?.experience?.company_name ||
-                  "No experience added yet"
-                }
-              />
-              <InfoRow
-                label="Year active"
-                value={
-                  user.seeker?.experience?.experience_years ||
-                  "No experience added yet"
-                }
-              />
+              {user.seeker?.education ? (
+                <>
+                  <InfoRow
+                    label="Education"
+                    value={user.seeker.education.school_name}
+                  />
+                  <InfoRow
+                    label="Degree"
+                    value={user.seeker.education.degree}
+                  />
+                  <InfoRow
+                    label="Field of Study"
+                    value={user.seeker.education.field_of_study}
+                  />
+                  <InfoRow
+                    label="Start Date"
+                    value={user.seeker.education.start_date}
+                  />
+                  <InfoRow
+                    label="End Date"
+                    value={user.seeker.education.end_date}
+                  />
+                  <div className="flex flex-col items-start gap-2 mt-2">
+                    <EducationModal
+                      seekerId={user.seeker.id}
+                      education={{
+                        seeker_id: user.seeker.education?.id || "",
+                        school_name: user.seeker.education?.school_name || "",
+                        degree: user.seeker.education?.degree || "",
+                        field_of_study:
+                          user.seeker.education?.field_of_study || "",
+                        start_date: user.seeker.education?.start_date || "",
+                        end_date: user.seeker.education?.end_date || "",
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-start gap-2 mt-4">
+                  <p className="text-gray-600">
+                    Education history
+                    <br />
+                    Tell employers about your education.
+                  </p>
+                  <EducationModal seekerId={user.seeker.id} />
+                </div>
+              )}
+              <Separator className="my-4" />
 
-              <InfoRow
-                label="Position"
-                value={
-                  user.seeker?.experience?.position || "No position added yet"
-                }
-              />
-
-              <InfoRow
-                label="Description"
-                value={
-                  user.seeker?.experience?.description ||
-                  "No description added yet"
-                }
-              />
-              <div className="flex justify-end w-full mt-4 sm:mt-0">
-                <Button
-                  className="w-full sm:w-auto"
-                  onClick={() => router.push("/profile/experience/")}
-                >
-                  Experience Setups
-                </Button>
-              </div>
+              {user.seeker?.certificates ? (
+                <>
+                  <InfoRow
+                    label="Certificates"
+                    value={user.seeker.certificates}
+                  />
+                  <div className="flex flex-col items-start gap-2 mt-2">
+                    <CertificateModal seekerId={user.seeker.id} />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-start gap-2 mt-4">
+                  <p className="text-gray-600">
+                    Certificates
+                    <br />
+                    Showcase your professional credentials. Add your relevant
+                    licences, certificates, memberships and accreditations here.
+                  </p>
+                  <CertificateModal seekerId={user.seeker.id} />
+                </div>
+              )}
             </ProfileSection>
           </div>
 
@@ -339,18 +448,12 @@ export default function Profile() {
                   </Button>
                 </div>
               )}
-              <div className="flex justify-between mt-4">
+              <div className="flex justify-center mt-4">
                 <Button
-                  onClick={() => router.push("/applied-jobs")}
+                  onClick={() => router.push("/job/applied-jobs")}
                   variant="outline"
                 >
                   Applied Jobs
-                </Button>
-                <Button
-                  onClick={() => router.push("/saved-jobs")}
-                  variant="outline"
-                >
-                  Saved Jobs
                 </Button>
               </div>
             </ProfileSection>

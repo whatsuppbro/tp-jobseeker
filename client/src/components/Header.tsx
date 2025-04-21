@@ -104,13 +104,6 @@ export default function Header() {
 
                 {user?.role === "seeker" && (
                   <DropdownMenuItem
-                    onClick={() => router.push("/job/saved-jobs")}
-                  >
-                    Saved Jobs
-                  </DropdownMenuItem>
-                )}
-                {user?.role === "seeker" && (
-                  <DropdownMenuItem
                     onClick={() => router.push("/job/applied-jobs")}
                   >
                     Applied Jobs
@@ -162,13 +155,7 @@ export default function Header() {
                   <DropdownMenuItem onClick={() => router.push("/setting")}>
                     Setting
                   </DropdownMenuItem>
-                  {user?.role === "seeker" && (
-                    <DropdownMenuItem
-                      onClick={() => router.push("/job/saved-jobs")}
-                    >
-                      Saved Jobs
-                    </DropdownMenuItem>
-                  )}
+
                   {user?.role === "seeker" && (
                     <DropdownMenuItem
                       onClick={() => router.push("/job/applied-jobs")}

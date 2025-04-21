@@ -5,8 +5,14 @@ export const SeekerModel = t.Object({
   phonenumber: t.String(),
   address: t.String(),
   city: t.String(),
+  certificates: t.String(),
   avatar_url: t.String(),
   resume_url: t.String(),
 });
 
+export const CertificateModel = t.Object({
+  certificates: t.String(),
+});
+
 export type SeekerType = typeof SeekerModel.static;
+export type CertificateType = typeof CertificateModel.static;
