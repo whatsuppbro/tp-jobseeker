@@ -114,6 +114,25 @@ export const getApplicationsByUserId = async (userId: string) => {
           },
         },
       },
+      user: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          seeker: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+            with: {
+              experience: true,
+              skills: true,
+              education: true,
+            },
+          },
+        },
+      },
     },
     columns: {
       created_at: false,
