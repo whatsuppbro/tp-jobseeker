@@ -28,135 +28,87 @@ export default function Setting() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser: User = JSON.parse(storedUser);
       setUser(parsedUser);
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         firstname: parsedUser.firstname || "",
         lastname: parsedUser.lastname || "",
         email: parsedUser.email,
-      });
-    } else {
-      router.push("/signin");
+      }));
     }
-  }, [router]);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return;
-
     setIsSaving(true);
+
     try {
-      const isEmailChanged = formData.email !== user.email;
-      if (isEmailChanged && !formData.currentPassword) {
-        toast.error("Current password is required to update email.");
-        return;
-      }
-
-      const isPasswordChanged = formData.newPassword.trim() !== "";
-      if (isPasswordChanged) {
-        if (formData.newPassword !== formData.confirmPassword) {
-          toast.error("Passwords do not match.");
-          return;
-        }
-        if (!formData.currentPassword) {
-          toast.error("Current password is required to update password.");
-          return;
-        }
-      }
-
-      const profileResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/${user.id}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${user?.id}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            firstname: formData.firstname,
-            lastname: formData.lastname,
-            email: formData.email,
-            currentPassword: formData.currentPassword,
-          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(formData),
         }
       );
 
-      if (!profileResponse.ok) {
-        throw new Error("Failed to update profile.");
+      if (!response.ok) {
+        throw new Error("Failed to update user data");
       }
 
-      if (isPasswordChanged) {
-        const passwordResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user/change-password`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              currentPassword: formData.currentPassword,
-              newPassword: formData.newPassword,
-            }),
-          }
-        );
-
-        if (!passwordResponse.ok) {
-          throw new Error("Failed to update password.");
-        }
-      }
-
-      const updatedUser = {
-        ...user,
-        firstname: formData.firstname,
-        lastname: formData.lastname,
-        email: formData.email,
-      };
+      const updatedUser = { ...user, ...formData };
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      toast.success("Profile updated successfully!");
-      router.push("/profile");
+      toast.success("Settings updated successfully");
     } catch (error) {
-      toast.error("Update failed. Check your inputs and try again.");
-      console.error("Error:", error);
+      console.error(error);
+      toast.error("Error updating settings");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteAccount = async () => {
-    if (!user) return;
-
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete your account?")) {
+      return;
+    }
 
     setIsDeleting(true);
+
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/${user.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${user?.id}`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete account.");
+        throw new Error("Failed to delete account");
       }
 
       localStorage.removeItem("user");
-      toast.success("Account deleted successfully.");
+      localStorage.removeItem("token");
+      toast.success("Account deleted successfully");
       router.push("/signin");
     } catch (error) {
-      toast.error("Failed to delete account. Please try again.");
-      console.error("Error:", error);
+      console.error(error);
+      toast.error("Error deleting account");
     } finally {
       setIsDeleting(false);
     }
@@ -259,7 +211,6 @@ export default function Setting() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
-          {" "}
           <Button
             type="submit"
             disabled={isSaving}

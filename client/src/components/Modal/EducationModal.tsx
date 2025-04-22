@@ -76,6 +76,7 @@ export default function EducationModal({
       toast.success(education ? "Education updated" : "Education added");
       setIsOpen(false);
       onEducationUpdated?.();
+      window.location.reload();
     } catch (error) {
       toast.error("Something went wrong");
     } finally {

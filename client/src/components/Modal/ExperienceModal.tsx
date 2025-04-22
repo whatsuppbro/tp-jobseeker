@@ -73,6 +73,7 @@ export default function ExperienceModal({
       toast.success(experience ? "Experience updated" : "Experience added");
       setIsOpen(false);
       onExperienceUpdated?.();
+      window.location.reload();
     } catch (error) {
       toast.error("Something went wrong");
     } finally {

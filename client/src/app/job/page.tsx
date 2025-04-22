@@ -1,6 +1,15 @@
 "use client";
 import SearchFilter from "@/components/SearchFilter/SearchFilter";
 import { useState, useEffect } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+  CardContent,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
   Pagination,
@@ -120,30 +129,53 @@ export default function Page() {
           <ul className="space-y-4">
             {currentJobs.map((job) => (
               <Link href={`/job/${job.id}`} key={job.id}>
-                <div className="mb-4">
-                  <li
-                    key={job.id}
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <h2 className="text-xl font-semibold ">{job.title}</h2>
-                    <p className="text-gray-600 line-clamp-2">
-                      {job.description}
-                    </p>
-                    <div className="mt-2 flex justify-between items-center">
-                      <span className="text-sm text-gray-500">
-                        {job.location}
-                      </span>
-                      <span className="text-sm font-medium text-green-600">
-                        ${job.salary}
+                <Card className="hover:bg-muted transition-colors duration-300 my-4 shadow-md rounded-lg cursor-pointer gap-0">
+                  <div className="px-6">
+                    <CardHeader className=" flex flex-col items-start justify-between p-4">
+                      <CardTitle className="text-lg font-semibold text-gray-800">
+                        <img
+                          src={
+                            job.company.image_url ||
+                            "https://png.pngtree.com/png-clipart/20230926/original/pngtree-unknown-user-warning-black-glyph-icon-digital-design-logo-vector-png-image_12785034.png"
+                          }
+                          alt={`${job.company.company_name} logo`}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <h1 className="text-2xl text-black">{job.title}</h1>
+                      </CardTitle>
+                    </CardHeader>
+                  </div>
+                  <CardDescription className="text-sm px-6 text-gray-600">
+                    <div className="flex justify-between items-center px-4">
+                      <span className="text-sm text-gray-900 ">
+                        {job.description}
                       </span>
                     </div>
-                    <div className="mt-2 flex justify-between items-center">
-                      <span className="text-sm text-gray-500">
-                        Type: {job.job_type}
-                      </span>
-                    </div>
-                  </li>
-                </div>
+                  </CardDescription>
+                  <CardContent className="flex flex-col justify-between h-full">
+                    <div className="p-4 space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-900">
+                          Company: {job.company.company_name}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="text-green-600 font-medium"
+                        >
+                          ${job.salary}
+                        </Badge>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-900">
+                          {job.location}
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          Type: {job.job_type}
+                        </span>
+                      </div>
+                    </div>{" "}
+                  </CardContent>
+                </Card>
               </Link>
             ))}
           </ul>
