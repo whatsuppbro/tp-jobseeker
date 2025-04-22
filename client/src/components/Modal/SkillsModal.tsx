@@ -82,6 +82,7 @@ export default function SkillsModal({
       if (!response.ok) throw new Error("Failed to delete skill");
 
       onSkillUpdated?.();
+      window.location.reload();
       toast.success("Skill deleted successfully");
     } catch (error) {
       console.error(error);
