@@ -37,10 +37,13 @@ interface Job {
 }
 
 export default async function JobDetail({
+  role,
   params,
 }: {
   params: { id: string };
+  role: string;
 }) {
+  const userRole = role;
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/jobs/${params.id}`
@@ -107,7 +110,9 @@ export default async function JobDetail({
             </p>
           </CardContent>
         </Card>
-        <ApplyButton jobId={job.id} applications={job.applications} />
+        {userRole === "seeker" && (
+          <ApplyButton jobId={job.id} applications={job.applications} />
+        )}
       </div>
     );
   } catch (error) {

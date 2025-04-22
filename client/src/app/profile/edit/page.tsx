@@ -24,10 +24,7 @@ interface User {
 }
 
 const SeekerFormSchema = z.object({
-  phonenumber: z
-    .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number")
-    .or(z.literal("")),
+  phonenumber: z.string(),
   address: z.string(),
   city: z.string(),
   resume_url: z.union([z.string().url(), z.literal("")]).optional(),
