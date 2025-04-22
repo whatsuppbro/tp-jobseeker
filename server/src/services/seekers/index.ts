@@ -87,3 +87,20 @@ export const deleteSeeker = async (id: string) => {
 
   return seeker;
 };
+
+export const updateOnlyCertificate = async (
+  id: string,
+  certificates: string
+) => {
+  const updatedSeeker = await db
+    .update(table.seeker)
+    .set({ certificates })
+    .where(eq(table.seeker.id, id))
+    .returning();
+
+  if (updatedSeeker.length === 0) {
+    throw new Error("Seeker not found");
+  }
+
+  return updatedSeeker[0];
+};

@@ -54,6 +54,7 @@ export default function Dashboard() {
     location: "",
     salary: "",
     job_type: "",
+    image_url: "",
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -139,6 +140,7 @@ export default function Dashboard() {
         location: "",
         salary: "",
         job_type: "",
+        image_url: "",
       });
 
       toast.success("Job posted successfully!");
@@ -185,12 +187,21 @@ export default function Dashboard() {
           <p>
             <strong>Name:</strong> {company.company_name}
           </p>
+
           <p>
             <strong>Description:</strong> {company.company_description}
           </p>
-          <p>
-            <strong>Website:</strong> {company.company_website}
-          </p>
+          <div>
+            <strong>Website:</strong>
+            <a
+              href={company.company_website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline ml-2"
+            >
+              View Website
+            </a>
+          </div>
           <p>
             <strong>Email:</strong> {company.company_email}
           </p>
@@ -216,6 +227,19 @@ export default function Dashboard() {
               value={newJob.title}
               onChange={handleInputChange}
               placeholder="Job Title"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">
+              Image URL
+            </label>
+            <Input
+              type="url"
+              name="image_url"
+              value={newJob.image_url}
+              onChange={handleInputChange}
+              placeholder="image url (e.g., https://example.com/image.jpg)"
             />
           </div>
           <div>
@@ -228,6 +252,7 @@ export default function Dashboard() {
               onChange={handleInputChange}
               placeholder="Job Description"
               rows={4}
+              required
             />
           </div>
           <div>
@@ -239,6 +264,7 @@ export default function Dashboard() {
               value={newJob.location}
               onChange={handleInputChange}
               placeholder="Job Location"
+              required
             />
           </div>
           <div>
@@ -246,10 +272,12 @@ export default function Dashboard() {
               Salary
             </label>
             <Input
+              type="number"
               name="salary"
               value={newJob.salary}
               onChange={handleInputChange}
               placeholder="Salary (e.g., $5000)"
+              required
             />
           </div>
           <div>
@@ -261,6 +289,7 @@ export default function Dashboard() {
               value={newJob.job_type}
               onChange={handleInputChange}
               placeholder="Job Type (e.g., Full-Time, Part-Time)"
+              required
             />
           </div>
           <Button type="submit">Post Job</Button>

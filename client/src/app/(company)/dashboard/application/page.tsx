@@ -19,6 +19,7 @@ interface Job {
   description: string;
   location: string;
   salary: string;
+  image_url: string;
   job_type: string;
   company: {
     company_name: string;
@@ -169,9 +170,14 @@ export default function ApplicationsDetails() {
 
   return (
     <div className="container mx-auto px-4 py-12 space-y-12">
-      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+      <div className="bg-white rounded-xl shadow-xl p-6 border border-gray-100">
         <h2 className="text-2xl font-semibold mb-4">Job Details</h2>
         <div className="space-y-4">
+          <img
+            src={job.image_url || "https://picsum.photos/1000"}
+            alt={job.title}
+            className="w-full h-64 object-cover rounded-t-lg"
+          />
           <p>
             <strong>Title:</strong> {job.title}
           </p>
@@ -201,7 +207,7 @@ export default function ApplicationsDetails() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+      <div className="bg-white rounded-xl shadow-xl p-6 border border-gray-100">
         <h2 className="text-2xl font-semibold mb-4">Applications</h2>
         {job?.applications?.length > 0 ? (
           <Table>

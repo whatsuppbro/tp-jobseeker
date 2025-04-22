@@ -9,4 +9,9 @@ export const SeekerModel = t.Object({
   resume_url: t.String(),
 });
 
+export const CertificateModel = t.Object({
+  certificates: t.String(),
+});
+
 export type SeekerType = typeof SeekerModel.static;
+export type CertificateType = typeof CertificateModel.static;

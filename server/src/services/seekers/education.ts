@@ -25,6 +25,20 @@ export const updateEducation = async (
   return { message: "Update education", data: result[0] };
 };
 
+export const updateEducationBySeekerId = async (
+  seekerId: string,
+  body: Partial<EducationType>
+) => {
+  const result = await db
+    .update(education)
+    .set(body)
+    .where(eq(education.seeker_id, seekerId))
+    .returning()
+    .execute();
+
+  return { message: "Update education", data: result[0] };
+};
+
 export const createEducationBySeekerId = async (
   seekerId: string,
   body: Omit<EducationType, "seeker_id">

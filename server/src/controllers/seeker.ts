@@ -6,11 +6,14 @@ import {
   createSeeker,
   createSeekerWithUserId,
   updateSeeker,
+  updateOnlyCertificate,
 } from "@/services/seekers";
 import {
   getSkillBySeeker,
   updateSkill,
   createSkillBySeekerId,
+  deleteSkillById,
+  getSkillById,
 } from "@/services/seekers/skill";
 import { SeekerModel } from "@/db/models/seekers";
 import { SkillModel } from "@/db/models/skill";
@@ -19,9 +22,10 @@ import {
   getEducationBySeeker,
   createEducationBySeekerId,
   updateEducation,
+  updateEducationBySeekerId,
 } from "@/services/seekers/education";
 import { EducationModel } from "@/db/models/education";
-import { education } from "@/db/schema";
+import { CertificateModel } from "@/db/models/seekers";
 const controller = "seeker";
 
 export const seekerController = new Elysia({
@@ -187,7 +191,9 @@ export const seekerController = new Elysia({
       "/education/:id",
       async ({ params, body }) => {
         try {
-          const seeker = await updateEducation(params.id, { ...body });
+          const seeker = await updateEducationBySeekerId(params.id, {
+            ...body,
+          });
           if (!seeker) {
             throw new Error("Seeker not found");
           }
@@ -198,6 +204,38 @@ export const seekerController = new Elysia({
       },
       {
         body: EducationModel,
+      }
+    )
+    .delete("/skill/:id", async ({ params }) => {
+      try {
+        const seeker = await deleteSkillById(params.id);
+        if (!seeker) {
+          throw new Error("Seeker not found");
+        }
+        return SuccessHandler(seeker);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
+
+    .put(
+      "/certificate/:id",
+      async ({ params, body }) => {
+        try {
+          const seeker = await updateOnlyCertificate(
+            params.id,
+            body.certificates
+          );
+          if (!seeker) {
+            throw new Error("Seeker not found");
+          }
+          return SuccessHandler(seeker);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        body: CertificateModel,
       }
     )
 );

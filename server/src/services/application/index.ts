@@ -31,6 +31,11 @@ export const getApplications = async () => {
               created_at: false,
               updated_at: false,
             },
+            with: {
+              experience: true,
+              skills: true,
+              education: true,
+            },
           },
         },
       },
@@ -66,6 +71,19 @@ export const getApplicationsById = async (id: string) => {
           created_at: false,
           updated_at: false,
         },
+        with: {
+          seeker: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+            with: {
+              experience: true,
+              skills: true,
+              education: true,
+            },
+          },
+        },
       },
     },
     columns: {
@@ -92,6 +110,25 @@ export const getApplicationsByUserId = async (userId: string) => {
             columns: {
               created_at: false,
               updated_at: false,
+            },
+          },
+        },
+      },
+      user: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+        with: {
+          seeker: {
+            columns: {
+              created_at: false,
+              updated_at: false,
+            },
+            with: {
+              experience: true,
+              skills: true,
+              education: true,
             },
           },
         },

@@ -135,7 +135,7 @@ export default function Contact() {
           <div>
             <p className="text-sm font-medium text-gray-500 mb-2">Location</p>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.535664941859!2d100.53427788549998!3d13.74653886299582!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29ecfc2f455e1%3A0xc4ad0280d8906604!2scentralwOrld!5e0!3m2!1sen!2sth!4v1745143199833!5m2!1sen!2sth"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3871.8587051177255!2d100.58284097591942!3d13.967014692272713!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2816f1377fc17%3A0x63d330b7f8af6e16!2sRangsit%20University!5e0!3m2!1sen!2sth!4v1745259481291!5m2!1sen!2sth"
               width="100%"
               height="200"
               style={{ border: 0 }}
