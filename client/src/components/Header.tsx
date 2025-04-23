@@ -12,6 +12,7 @@ import { navList as defaultNavList } from "@/data/navList";
 import { AlignJustify, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Icon from "@/app/icon.png";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -71,8 +72,16 @@ export default function Header() {
     <nav className="bg-background border-b">
       <div className="container flex items-center justify-between h-16">
         <div>
-          <Link href="/" className="text-lg font-bold">
-            JobTP
+          <Link
+            href="/"
+            className="flex items-center text-lg font-bold space-x-2"
+          >
+            <img
+              src={Icon.src}
+              alt="Logo"
+              className="h-10 w-10 object-contain"
+            />
+            <span>JobTP</span>
           </Link>
         </div>
 
