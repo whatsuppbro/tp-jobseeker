@@ -19,7 +19,9 @@ interface User {
   email: string;
   phone: string;
   role: "seeker" | "company";
-  seeker: {};
+  seeker: {
+    id: string;
+  };
 }
 
 export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
@@ -40,7 +42,7 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
 
       const userId = parsedUser.id;
       const userResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/user/${userId}`
       );
 
       if (!userResponse.ok) return;
@@ -132,7 +134,6 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
       </div>
     );
   }
-
   return (
     <div className="flex justify-center mt-4">
       <Button

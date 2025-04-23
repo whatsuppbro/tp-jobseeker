@@ -20,6 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { MapPin } from "lucide-react";
 
 export default function Page() {
   const [filters, setFilters] = useState({
@@ -167,7 +168,9 @@ export default function Page() {
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-900">
-                          {job.location}
+                          <div className="flex items-center gap-1">
+                            <MapPin size={15} />: {job.location}
+                          </div>
                         </span>
                         <span className="text-sm text-gray-900">
                           Type: {job.job_type}
