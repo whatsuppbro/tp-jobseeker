@@ -6,3 +6,5 @@ export { skill, skillRelations } from "./skill";
 export { application, applicationRelations } from "./application";
 export { jobs, jobsRelations } from "./jobs";
 export { education, educationRelations } from "./education";
+export { verification, verificationRelations } from "./verification";
+export { admin } from "./admin";

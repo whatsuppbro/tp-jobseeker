@@ -5,6 +5,7 @@ import { seekerController } from "./seeker";
 import { experienceController } from "./experience";
 import { jobsController } from "./jobs";
 import { applicationController } from "./application";
+import { adminController } from "./admin";
 
 export default new Elysia()
   .use(userController)
@@ -12,4 +13,5 @@ export default new Elysia()
   .use(seekerController)
   .use(experienceController)
   .use(jobsController)
-  .use(applicationController);
+  .use(applicationController)
+  .use(adminController);

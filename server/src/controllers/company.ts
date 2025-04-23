@@ -1,4 +1,6 @@
 import Elysia from "elysia";
+import { t } from "elysia";
+import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
 import {
   getCompanies,
   getCompanyById,
@@ -9,8 +11,12 @@ import {
   deleteCompany,
 } from "@/services/company";
 import { CompanyModel } from "@/db/models/company";
-import { t } from "elysia";
-import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
+import {
+  getVerifiedById,
+  getVerifiedByCompany,
+  updateVerified,
+} from "@/services/company/verification";
+import { VerificationModel } from "@/db/models/verification";
 
 const controller = "company";
 
@@ -115,4 +121,53 @@ export const companyController = new Elysia({
         return ErrorHandler(error);
       }
     })
+    .get(
+      `/verification/:id`,
+      async ({ params }) => {
+        try {
+          const verification = await getVerifiedById(params.id);
+          return SuccessHandler(verification);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+      }
+    )
+    .get(
+      `/verification/company/:id`,
+      async ({ params }) => {
+        try {
+          const verification = await getVerifiedByCompany(params.id);
+          return SuccessHandler(verification);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+      }
+    )
+    .put(
+      `/verification/:id`,
+      async ({ params, body }) => {
+        try {
+          const verification = await updateVerified(params.id, body);
+          return SuccessHandler(verification);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: VerificationModel,
+      }
+    )
 );
