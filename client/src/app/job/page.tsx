@@ -169,7 +169,8 @@ export default function Page() {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-900">
                           <div className="flex items-center gap-1">
-                            <MapPin size={15} />: {job.location}
+                            <MapPin size={15} className="text-gray-500" />:{" "}
+                            {job.location}
                           </div>
                         </span>
                         <span className="text-sm text-gray-900">
