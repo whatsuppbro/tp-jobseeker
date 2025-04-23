@@ -11,4 +11,11 @@ export const UserModel = t.Object({
   ),
 });
 
+export const UserUpdateModel = t.Object({
+  firstname: t.String(),
+  lastname: t.String(),
+  email: t.String(),
+});
+
 export type UserType = typeof UserModel.static;
+export type UserUpdateType = typeof UserUpdateModel.static;
