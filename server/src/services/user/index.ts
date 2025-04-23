@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "@/db";
 import * as table from "@/db/schema";
-import { UserType } from "@/db/models/user";
+import { UserType, UserUpdateType } from "@/db/models/user";
 
 export const getUsers = async () => {
   const users = await db.query.user.findMany({
@@ -110,6 +110,33 @@ export const createUser = async (body: UserType) => {
 
 export const deleteUser = async (id: string) => {
   const user = await db.delete(table.user).where(eq(table.user.id, id));
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+};
+
+export const updateUserPassword = async (id: string, password: string) => {
+  const [user] = await db
+    .update(table.user)
+    .set({ password })
+    .where(eq(table.user.id, id))
+    .returning();
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+};
+
+export const updateUserInformation = async (
+  id: string,
+  body: UserUpdateType
+) => {
+  const [user] = await db
+    .update(table.user)
+    .set(body)
+    .where(eq(table.user.id, id))
+    .returning();
 
   if (!user) throw new Error("User not found");
 

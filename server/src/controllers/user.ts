@@ -6,8 +6,10 @@ import {
   updateUser,
   createUser,
   deleteUser,
+  updateUserPassword,
+  updateUserInformation,
 } from "@/services/user";
-import { UserModel } from "@/db/models/user";
+import { UserModel, UserUpdateModel } from "@/db/models/user";
 import { t } from "elysia";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
 
@@ -55,6 +57,63 @@ export const userController = new Elysia({
           id: t.String(),
         }),
         body: UserModel,
+      }
+    )
+
+    .put(
+      "/password/:id",
+      async ({ params, body }) => {
+        try {
+          const { password, newPassword } = body;
+          const user = await getUserById(params.id);
+          if (!user) {
+            throw new Error("User not found");
+          }
+
+          if (!(await Bun.password.verify(password, user.password))) {
+            throw new Error("Invalid password");
+          }
+
+          const hashedPassword = await Bun.password.hash(newPassword, {
+            algorithm: "bcrypt",
+            cost: 4,
+          });
+
+          const updatedUser = await updateUserPassword(
+            params.id,
+            hashedPassword
+          );
+          return SuccessHandler(updatedUser);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: t.Object({
+          password: t.String(),
+          newPassword: t.String({ minLength: 6 }),
+        }),
+      }
+    )
+
+    .put(
+      "/information/:id",
+      async ({ params, body }) => {
+        try {
+          const user = await updateUserInformation(params.id, body);
+          return SuccessHandler(user);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: UserUpdateModel,
       }
     )
 
