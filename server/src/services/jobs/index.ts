@@ -35,8 +35,14 @@ export const getJobsById = async (id: string) => {
 };
 
 export const getJobsByCompanyId = async (companyId: string) => {
-  const jobs = await db.query.jobs.findFirst({
+  const jobs = await db.query.jobs.findMany({
     where: eq(table.jobs.company_id, companyId),
+    with: {
+      company: true,
+      applications: {
+        with: { user: true },
+      },
+    },
     columns: {
       created_at: false,
       updated_at: false,

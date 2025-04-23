@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -160,7 +160,7 @@ export default function Setting() {
         toast.success("Password updated successfully");
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-        router.push("/signin");
+        window.location.href = "/signin";
       } else {
         toast.error(result.message || "Failed to update password");
       }
@@ -200,7 +200,7 @@ export default function Setting() {
         toast.success("Account deleted successfully");
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-        router.push("/");
+        window.location.href = "/";
       } else {
         toast.error(result.message || "Failed to delete account");
       }

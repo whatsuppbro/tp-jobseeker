@@ -34,6 +34,7 @@ interface Job {
 
 interface Company {
   id: string;
+  company_id: string;
   company_name: string;
   company_description: string;
   company_website: string;
@@ -73,6 +74,14 @@ export default function Dashboard() {
           return;
         }
         const companyId = parsedUser.id;
+        const fetchCompanyData = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/company/user/${companyId}`
+        );
+        if (!fetchCompanyData.ok) {
+          throw new Error("Failed to fetch company data");
+        }
+        const companyInfoData = await fetchCompanyData.json();
+        console.log("Company Info Data:", companyInfoData);
 
         const companyResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/company/user/${companyId}`
@@ -84,7 +93,7 @@ export default function Dashboard() {
         setCompany(companyData.data);
 
         const jobsResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/jobs?company_id=${companyId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/jobs/company/${companyInfoData.data.id}`
         );
         if (!jobsResponse.ok) {
           throw new Error("Failed to fetch jobs");
