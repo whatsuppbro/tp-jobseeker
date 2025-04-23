@@ -19,8 +19,16 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
     "pending" | "accepted" | "rejected" | null
   >(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSeeker, setIsSeeker] = useState(false);
 
   useEffect(() => {
+    const checkUserRole = () => {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+      const parsedUser = JSON.parse(userData);
+      setIsSeeker(parsedUser.role === "seeker");
+    };
+
     const checkApplicationStatus = async () => {
       const userData = localStorage.getItem("user");
       if (!userData) return;
@@ -30,6 +38,8 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
       );
       setApplicationStatus(userApplication?.status || null);
     };
+
+    checkUserRole();
     checkApplicationStatus();
   }, [applications]);
 
@@ -69,6 +79,10 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
       setIsLoading(false);
     }
   };
+
+  if (!isSeeker) {
+    return null;
+  }
 
   const buttonText = isLoading
     ? "Applying..."

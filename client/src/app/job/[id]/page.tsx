@@ -6,7 +6,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import ApplyButton from "@/components/ApplyButton";
+import ApplyButtonWrapper from "@/components/ApplyButton";
 
 interface Job {
   id: string;
@@ -37,13 +37,10 @@ interface Job {
 }
 
 export default async function JobDetail({
-  role,
   params,
 }: {
   params: { id: string };
-  role: string;
 }) {
-  const userRole = role;
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/jobs/${params.id}`
@@ -110,9 +107,8 @@ export default async function JobDetail({
             </p>
           </CardContent>
         </Card>
-        {userRole === "seeker" && (
-          <ApplyButton jobId={job.id} applications={job.applications} />
-        )}
+
+        <ApplyButtonWrapper jobId={job.id} applications={job.applications} />
       </div>
     );
   } catch (error) {
