@@ -141,7 +141,7 @@ export default function JobApplied() {
       ) : (
         <div className="text-center">
           <p className="text-gray-600 mb-4">No applications found.</p>
-          <Button onClick={() => router.push("/jobs")} variant="secondary">
+          <Button onClick={() => router.push("/job")} variant="secondary">
             Browse Jobs
           </Button>
         </div>
