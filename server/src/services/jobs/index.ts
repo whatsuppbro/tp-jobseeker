@@ -69,9 +69,19 @@ export const updateJobs = async (id: string, data: JobType) => {
 };
 
 export const deleteJobs = async (id: string) => {
-  const jobs = await db
-    .delete(table.jobs)
-    .where(eq(table.jobs.id, id))
-    .returning();
-  return jobs;
+  try {
+    await db.delete(table.application).where(eq(table.application.job_id, id));
+
+    const deletedJob = await db
+      .delete(table.jobs)
+      .where(eq(table.jobs.id, id))
+      .returning();
+
+    return deletedJob;
+  } catch (error) {
+    console.error("Error deleting job:", error);
+    throw new Error(
+      "Failed to delete job. Please check for dependent records."
+    );
+  }
 };

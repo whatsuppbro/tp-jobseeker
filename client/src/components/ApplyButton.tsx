@@ -13,6 +13,15 @@ interface ApplyButtonProps {
   }[];
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: "seeker" | "company";
+  seeker: {};
+}
+
 export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
   const router = useRouter();
   const [applicationStatus, setApplicationStatus] = useState<
@@ -20,13 +29,26 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
   >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSeeker, setIsSeeker] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const checkUserRole = () => {
+    const checkUserRole = async () => {
       const userData = localStorage.getItem("user");
       if (!userData) return;
       const parsedUser = JSON.parse(userData);
       setIsSeeker(parsedUser.role === "seeker");
+
+      const userId = parsedUser.id;
+      const userResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`
+      );
+
+      if (!userResponse.ok) return;
+      const user = await userResponse.json();
+      const userInformation: User = {
+        ...user.data,
+      };
+      setUser(userInformation);
     };
 
     const checkApplicationStatus = async () => {
@@ -100,6 +122,16 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
       : applicationStatus === "rejected"
       ? "destructive"
       : "default";
+
+  if (!user?.seeker) {
+    return (
+      <div className="flex justify-center mt-4">
+        <Button onClick={() => router.push("/profile/edit")} size="lg">
+          Edit Personal Information
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center mt-4">
