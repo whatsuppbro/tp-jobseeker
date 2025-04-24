@@ -12,47 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
-
-type Applicant = {
-  id: string;
-  job_id: string;
-  user_id: string;
-  status: string;
-  user: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    seeker: {
-      id: string;
-      user_id: string;
-      avatar_url: string;
-      resume_url: string;
-      phonenumber: string;
-      address: string;
-      city: string;
-      certificates: string;
-      experience: {
-        id: string;
-        seeker_id: string;
-        company_name: string;
-        position: string;
-        description: string;
-        experience_years: string;
-      };
-      skills: { id: string; seeker_id: string; name: string }[];
-      education: {
-        id: string;
-        seeker_id: string;
-        school_name: string;
-        degree: string;
-        field_of_study: string;
-        start_date: string;
-        end_date: string;
-      };
-    };
-  };
-};
+import { Applicant } from "@/types/type";
 
 export default function ApplicantId() {
   const params = useParams<{ id: string }>();

@@ -8,63 +8,11 @@ import SkillsModal from "@/components/Modal/SkillsModal";
 import ExperienceModal from "@/components/Modal/ExperienceModal";
 import EducationModal from "@/components/Modal/EducationModal";
 import CertificateModal from "@/components/Modal/CertificateModal";
-interface User {
-  id: string;
-  email: string;
-  firstname?: string;
-  lastname?: string;
-  role: "seeker" | "company";
-  applications?: [
-    {
-      id: string;
-      job_id: string;
-      status: "pending" | "accepted" | "rejected";
-      job?: {
-        id: string;
-        title: string;
-        description: string;
-        location: string;
-        salary: string;
-        job_type: string;
-      };
-    }
-  ];
-  seeker?: {
-    id: string;
-    phonenumber?: string;
-    address?: string;
-    city?: string;
-    resume_url?: string;
-    avatar_url?: string;
-    certificates?: string;
-    education?: {
-      id?: string;
-      school_name?: string;
-      degree?: string;
-      field_of_study?: string;
-      start_date?: string;
-      end_date?: string;
-    };
-    experience?: {
-      id?: string;
-      company_name?: string;
-      position?: string;
-      experience_years?: string;
-      description?: string;
-    };
-    skills?: {
-      id?: string;
-      name?: string;
-    }[];
-  };
-  company_name?: string;
-  position?: string;
-  description?: string;
-}
+import { AllUserDetail } from "@/types/type";
 
 export default function Profile() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AllUserDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -90,7 +38,7 @@ export default function Profile() {
 
         const userDataResponse = await userResponse.json();
 
-        const completeUserData: User = {
+        const completeUserData: AllUserDetail = {
           ...userDataResponse.data,
         };
 
@@ -512,7 +460,7 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function calculateProfileCompleteness(user: User): number {
+function calculateProfileCompleteness(user: AllUserDetail): number {
   let completeFields = 1;
   if (user.firstname || user.lastname) completeFields++;
   if (user.seeker?.skills?.length) completeFields++;

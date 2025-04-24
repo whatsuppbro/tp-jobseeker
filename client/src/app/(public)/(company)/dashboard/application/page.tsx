@@ -12,37 +12,13 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
-
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  salary: string;
-  image_url: string;
-  job_type: string;
-  company: {
-    company_name: string;
-  };
-  applications: {
-    id: string;
-    name: string;
-    email: string;
-    status: "pending" | "accepted" | "rejected";
-    user: {
-      id: string;
-      firstname: string;
-      lastname: string;
-      email: string;
-    };
-  }[];
-}
+import { JobApplication } from "@/types/type";
 
 export default function ApplicationsDetails() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("job_id");
-  const [job, setJob] = useState<Job | null>(null);
+  const [job, setJob] = useState<JobApplication | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

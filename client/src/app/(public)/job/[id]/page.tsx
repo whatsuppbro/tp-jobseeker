@@ -7,34 +7,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import ApplyButtonWrapper from "@/components/ApplyButton";
-
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  salary: string;
-  job_type: string;
-  image_url: string;
-  company: {
-    company_name: string;
-    company_description: string;
-    company_website: string;
-    company_email: string;
-    company_phone: string;
-    company_address: string;
-    company_city: string;
-    company_country: string;
-    image_url: string;
-  };
-  applications: {
-    id: string;
-    user_id: string;
-    name: string;
-    email: string;
-    status: "pending" | "accepted" | "rejected";
-  }[];
-}
+import { JobwithCompany } from "@/types/type";
 
 export default async function JobDetail({
   params,
@@ -47,7 +20,7 @@ export default async function JobDetail({
     );
     if (!response.ok) return redirect("/#");
     const jobData = await response.json();
-    const job: Job = jobData.data;
+    const job: JobwithCompany = jobData.data;
 
     const pendingUserIds = job.applications
       .filter((app) => app.status === "pending")

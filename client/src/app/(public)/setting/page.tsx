@@ -5,13 +5,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { redirect, useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  email: string;
-  firstname?: string;
-  lastname?: string;
-}
+import { User } from "@/types/type";
 
 const userSchema = z.object({
   firstname: z.string().optional(),

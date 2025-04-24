@@ -4,35 +4,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-
-interface Application {
-  id: string;
-  status: "pending" | "accepted" | "rejected";
-  job_id: string;
-  user_id: string;
-  applied_at?: string;
-  job: {
-    id: string;
-    title: string;
-    description: string;
-    location: string;
-    salary: number;
-    job_type: string;
-    company: {
-      company_name: string;
-      company_description: string;
-      company_location: string;
-      company_address: string;
-      company_email: string;
-      company_phone: string;
-      company_website: string;
-    };
-  };
-}
+import { ApplicationCompany } from "@/types/type";
 
 export default function JobApplied() {
   const router = useRouter();
-  const [applications, setApplications] = useState<Application[]>([]);
+  const [applications, setApplications] = useState<ApplicationCompany[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

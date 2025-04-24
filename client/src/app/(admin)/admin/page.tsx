@@ -75,11 +75,7 @@ export default function Login() {
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to login. Please try again."
-      );
+      toast.error("Failed to login. Please try again.");
     } finally {
       setIsLoading(false);
     }

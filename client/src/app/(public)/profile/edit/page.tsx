@@ -6,22 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
 import { toast } from "sonner";
-
-interface User {
-  id: string;
-  email: string;
-  firstname?: string;
-  lastname?: string;
-  role: "seeker" | "company";
-  seeker?: {
-    id?: string;
-    phonenumber?: string;
-    address?: string;
-    city?: string;
-    resume_url?: string;
-    avatar_url?: string;
-  };
-}
+import { Seeker } from "@/types/type";
 
 const SeekerFormSchema = z.object({
   phonenumber: z.string(),
@@ -33,7 +18,7 @@ const SeekerFormSchema = z.object({
 
 export default function EditProfile() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Seeker | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 

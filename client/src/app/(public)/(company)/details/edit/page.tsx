@@ -4,24 +4,7 @@ import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-interface User {
-  id: string;
-  email: string;
-  firstname?: string;
-  lastname?: string;
-  role: "seeker" | "company";
-  company?: {
-    company_name: string;
-    company_description: string;
-    company_website: string;
-    company_email: string;
-    company_phone: string;
-    company_address: string;
-    company_city: string;
-    company_country: string;
-    image_url?: string;
-  };
-}
+import { User } from "@/types/type";
 
 export default function EditDetails() {
   const router = useRouter();
