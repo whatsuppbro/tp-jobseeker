@@ -5,7 +5,7 @@ import { relations } from "drizzle-orm";
 export const education = pgTable("education", {
   id: uuid("id").primaryKey().defaultRandom(),
   seeker_id: uuid("seeker_id")
-    .references(() => seeker.id)
+    .references(() => seeker.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
   school_name: text("school_name").notNull(),

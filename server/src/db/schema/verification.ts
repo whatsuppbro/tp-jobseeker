@@ -5,7 +5,7 @@ import { company } from "./company";
 export const verification = pgTable("verification", {
   id: uuid("id").primaryKey().defaultRandom(),
   company_id: uuid("company_id")
-    .references(() => company.id)
+    .references(() => company.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
   verified_url: text("verified_url").notNull(),

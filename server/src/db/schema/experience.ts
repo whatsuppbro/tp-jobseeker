@@ -5,7 +5,7 @@ import { seeker } from "./seekers";
 export const experience = pgTable("experience", {
   id: uuid("id").primaryKey().defaultRandom(),
   seeker_id: uuid("seeker_id")
-    .references(() => seeker.id)
+    .references(() => seeker.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
   company_name: text("company_name").notNull(),

@@ -8,7 +8,7 @@ import { education } from "./education";
 export const seeker = pgTable("seeker", {
   id: uuid("id").primaryKey().defaultRandom(),
   user_id: uuid("user_id")
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
   avatar_url: text("avatar_url"),

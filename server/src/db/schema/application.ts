@@ -6,10 +6,10 @@ import { user } from "./user";
 export const application = pgTable("application", {
   id: uuid("id").primaryKey().defaultRandom(),
   job_id: uuid("job_id")
-    .references(() => jobs.id)
+    .references(() => jobs.id, { onDelete: "cascade" })
     .notNull(),
   user_id: uuid("user_id")
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
   status: text("status", {
     enum: ["pending", "accepted", "rejected"],

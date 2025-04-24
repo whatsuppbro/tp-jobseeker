@@ -13,6 +13,7 @@ import { AlignJustify, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Icon from "@/app/icon.png";
+import { authHandler } from "@/utils/authHandler";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,6 +61,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
+    authHandler("signout");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUser(null);

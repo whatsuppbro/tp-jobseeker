@@ -7,7 +7,7 @@ import { verification } from "./verification";
 export const company = pgTable("company", {
   id: uuid("id").primaryKey().defaultRandom(),
   user_id: uuid("user_id")
-    .references(() => user.id)
+    .references(() => user.id, { onDelete: "cascade" })
     .notNull()
     .unique(),
   image_url: text("image_url"),

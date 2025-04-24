@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { adminAuthHandler } from "@/utils/adminAuthHandler";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -60,6 +61,7 @@ export default function Login() {
       }
 
       const { id, email, password, is_admin } = data.data;
+      await adminAuthHandler("adminsignin", data.data);
 
       localStorage.setItem(
         "admin",
@@ -71,7 +73,7 @@ export default function Login() {
       toast.success("Login successful!");
 
       if (is_admin === true) {
-        router.push("/job");
+        router.push("/admin/dashboard");
       }
     } catch (error) {
       console.error("Login error:", error);

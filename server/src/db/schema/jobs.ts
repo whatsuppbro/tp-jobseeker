@@ -6,7 +6,7 @@ import { application } from "./application";
 export const jobs = pgTable("jobs", {
   id: uuid("id").primaryKey().defaultRandom(),
   company_id: uuid("company_id")
-    .references(() => company.id)
+    .references(() => company.id, { onDelete: "cascade" })
     .notNull(),
   title: text("title").notNull(),
   description: text("description").notNull(),

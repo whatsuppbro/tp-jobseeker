@@ -17,6 +17,16 @@ export const getJobs = async () => {
   return jobs;
 };
 
+export const getAllJobs = async () => {
+  const jobs = await db.query.jobs.findMany({
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
+  });
+  return jobs;
+};
+
 export const getJobsById = async (id: string) => {
   const jobs = await db.query.jobs.findFirst({
     where: eq(table.jobs.id, id),

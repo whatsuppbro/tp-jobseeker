@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { authHandler } from "@/utils/authHandler";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -62,6 +63,7 @@ export default function Login() {
       const { id, email, role } = data.data.user;
 
       localStorage.setItem("user", JSON.stringify({ id, email, role }));
+      await authHandler("signin", data.data.user);
 
       window.dispatchEvent(new Event("storage"));
 
