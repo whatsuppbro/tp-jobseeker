@@ -26,6 +26,8 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [companys, setCompanys] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const itemPerPage = 8;
 
   useEffect(() => {
@@ -54,6 +56,38 @@ export default function AdminDashboard() {
     };
 
     fetchUsers();
+
+    const fetchCompanys = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/company`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data.");
+        }
+        const data = await response.json();
+        setCompanys(data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchCompanys();
+
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data.");
+        }
+        const data = await response.json();
+        setJobs(data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchJobs();
   }, []);
 
   const indexOfLastUser = currentPage * itemPerPage;
@@ -86,14 +120,14 @@ export default function AdminDashboard() {
           value={users.length.toString()}
         />
         <StatCard
-          title="Active Sessions"
-          description="Current active user sessions"
-          value="15"
+          title="Tocal Companies"
+          description="Total number of companies registered"
+          value={companys.length.toString()}
         />
         <StatCard
-          title="Pending Requests"
-          description="Requests awaiting approval"
-          value="7"
+          title="Total Jobs"
+          description="Total number of jobs posted"
+          value={jobs.length.toString()}
         />
       </div>
 
