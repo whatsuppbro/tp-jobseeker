@@ -7,7 +7,13 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Edit, Trash2 } from "lucide-react";
@@ -34,6 +40,7 @@ export default function EducationModal({
 }: EducationModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     school_name: education?.school_name || "",
     degree: education?.degree || "",
@@ -41,6 +48,40 @@ export default function EducationModal({
     start_date: education?.start_date || "",
     end_date: education?.end_date || "",
   });
+
+  const schoolDegreeMapping: Record<string, string[]> = {
+    "Rangsit University": ["Bachelor's Degree", "Master's Degree"],
+    "Bangkok University": ["Bachelor's Degree", "Doctoral Degree"],
+    "Chulalongkorn University": ["Master's Degree", "Doctoral Degree"],
+    "Thammasat University": ["Bachelor's Degree", "Master's Degree"],
+    "Mahidol University": ["Doctoral Degree"],
+    "Kasetsart University": ["Master's Degree", "Doctoral Degree"],
+  };
+
+  const degreeFieldMapping: Record<string, string[]> = {
+    "Bachelor's Degree": [
+      "Computer Science",
+      "Business Administration",
+      "Psychology",
+    ],
+    "Master's Degree": [
+      "Data Science",
+      "International Business",
+      "Clinical Psychology",
+    ],
+    "Doctoral Degree": ["Research", "Advanced Studies"],
+  };
+
+  const [availableDegrees, setAvailableDegrees] = useState<string[]>(
+    education?.school_name && schoolDegreeMapping[education.school_name]
+      ? schoolDegreeMapping[education.school_name]
+      : []
+  );
+  const [availableFields, setAvailableFields] = useState<string[]>(
+    education?.degree && degreeFieldMapping[education.degree]
+      ? degreeFieldMapping[education.degree]
+      : []
+  );
 
   if (!seekerId) {
     return (
@@ -88,7 +129,7 @@ export default function EducationModal({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {education ? (
-          <button className="text-blue-600 hover:underline flex items-center gap-1  cursor-pointer ml-2 text-sm">
+          <button className="text-blue-600 hover:underline flex items-center gap-1 cursor-pointer ml-2 text-sm">
             <Edit size={16} /> Edit
           </button>
         ) : (
@@ -100,48 +141,90 @@ export default function EducationModal({
           <DialogTitle>{education ? "Edit" : "Add"} Education</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <Input
-            type="text"
-            placeholder="School Name"
+          {/* School Name */}
+          <Select
             value={formData.school_name}
-            onChange={(e) =>
-              setFormData({ ...formData, school_name: e.target.value })
-            }
-            required
-          />
-          <Input
-            type="text"
-            placeholder="Degree"
-            value={formData.degree}
-            onChange={(e) =>
-              setFormData({ ...formData, degree: e.target.value })
-            }
-            required
-          />
-          <Input
-            type="text"
-            placeholder="Field of Study"
-            value={formData.field_of_study}
-            onChange={(e) =>
-              setFormData({ ...formData, field_of_study: e.target.value })
-            }
-            required
-          />
+            onValueChange={(value) => {
+              setFormData((prev) => ({
+                ...prev,
+                school_name: value,
+                degree: "",
+                field_of_study: "",
+              }));
+              setAvailableDegrees(schoolDegreeMapping[value] || []);
+              setAvailableFields([]);
+            }}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select School Name" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(schoolDegreeMapping).map((school, index) => (
+                <SelectItem key={index} value={school}>
+                  {school}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
+          {/* Degree */}
+          <Select
+            value={formData.degree}
+            onValueChange={(value) => {
+              setFormData((prev) => ({
+                ...prev,
+                degree: value,
+                field_of_study: "",
+              }));
+              setAvailableFields(degreeFieldMapping[value] || []);
+            }}
+            disabled={!formData.school_name}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Degree" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableDegrees.map((degree, index) => (
+                <SelectItem key={index} value={degree}>
+                  {degree}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Field of Study */}
+          <Select
+            value={formData.field_of_study}
+            onValueChange={(value) =>
+              setFormData((prev) => ({ ...prev, field_of_study: value }))
+            }
+            disabled={!formData.degree}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Field of Study" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableFields.map((field, index) => (
+                <SelectItem key={index} value={field}>
+                  {field}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <DatePicker
             selected={
               formData.start_date ? new Date(formData.start_date) : null
             }
             onChange={(date) => {
               const formattedDate = date ? format(date, "dd MMMM, yyyy") : "";
-              setFormData({ ...formData, start_date: formattedDate });
+              setFormData((prev) => ({ ...prev, start_date: formattedDate }));
             }}
           />
           <DatePicker
             selected={formData.end_date ? new Date(formData.end_date) : null}
             onChange={(date) => {
               const formattedDate = date ? format(date, "dd MMMM, yyyy") : "";
-              setFormData({ ...formData, end_date: formattedDate });
+              setFormData((prev) => ({ ...prev, end_date: formattedDate }));
             }}
           />
 
