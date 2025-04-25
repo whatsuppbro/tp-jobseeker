@@ -69,9 +69,8 @@ export const jobsController = new Elysia({
     .put(
       `/:id`,
       async ({ params, body }) => {
-        const parsedBody = JobModel.parse(body);
         try {
-          const jobs = await updateJobs(params.id, parsedBody);
+          const jobs = await updateJobs(params.id, { ...body });
           return SuccessHandler(jobs);
         } catch (error) {
           return ErrorHandler(error);

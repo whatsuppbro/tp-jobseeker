@@ -9,8 +9,9 @@ import {
   createCompany,
   updateCompany,
   deleteCompany,
+  updateCompanyById,
 } from "@/services/company";
-import { CompanyModel } from "@/db/models/company";
+import { CompanyModel, CompanyAdminModel } from "@/db/models/company";
 import {
   getVerifiedById,
   getVerifiedByCompany,
@@ -107,6 +108,28 @@ export const companyController = new Elysia({
           id: t.String(),
         }),
         body: CompanyModel,
+      }
+    )
+
+    .put(
+      "/company/:id",
+      async ({ params, body }) => {
+        try {
+          console.log("Incoming body:", body);
+          const company = await updateCompanyById(params.id, body);
+          if (!company) {
+            throw new Error("Company not found");
+          }
+          return SuccessHandler(company);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: CompanyAdminModel,
       }
     )
 

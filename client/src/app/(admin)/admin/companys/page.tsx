@@ -19,6 +19,7 @@ import {
 import { CustomPagination } from "@/components/AdminPagnation";
 import { toast } from "sonner";
 import { Company } from "@/types/type";
+import CompanyModal from "@/components/AdminModal/CompanysModal";
 
 export default function AdminCompany() {
   const [data, setData] = useState<Company[]>([]);
@@ -98,20 +99,7 @@ export default function AdminCompany() {
                     <TableCell>{user.company_email}</TableCell>
 
                     <TableCell className="flex justify-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="hover:bg-blue-100 hover:text-blue-600"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="hover:bg-red-600"
-                      >
-                        Delete
-                      </Button>
+                      <CompanyModal Id={user.id} Data={user} />
                     </TableCell>
                   </TableRow>
                 ))

@@ -18,6 +18,7 @@ export interface Job {
 
 export interface JobwithCompany {
   id: string;
+  company_id?: string;
   title: string;
   description: string;
   location: string;
@@ -55,6 +56,7 @@ export interface Company {
   company_address: string;
   company_city: string;
   company_country: string;
+  image_url: string;
 }
 
 export interface Applicant {
@@ -235,4 +237,33 @@ export interface AllUserDetail {
   company_name?: string;
   position?: string;
   description?: string;
+}
+
+export interface ApplicantionByUser {
+  id: string;
+  job_id: string;
+  user_id: string;
+  status: "pending" | "accepted" | "rejected";
+  applied_at?: string;
+  job: {
+    title: string;
+    description: string;
+    location: string;
+    salary: number;
+    job_type: string;
+    company: {
+      company_name: string;
+      company_description: string;
+      company_location: string;
+      company_address: string;
+      company_email: string;
+      company_phone: string;
+      company_website: string;
+    };
+  };
+  user: {
+    firstname: string;
+    lastname: string;
+    email: string;
+  };
 }

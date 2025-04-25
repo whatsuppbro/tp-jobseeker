@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "@/db";
 import * as table from "@/db/schema";
-import { CompanyType } from "@/db/models/company";
+import { CompanyType, CompanyAdminType } from "@/db/models/company";
 import { t } from "elysia";
 
 export const getCompanies = async () => {
@@ -83,6 +83,33 @@ export const updateCompany = async (
     .returning();
 
   console.log("Updated company:", updatedCompany);
+
+  if (!updatedCompany) {
+    throw new Error("Failed to update company");
+  }
+
+  return updatedCompany;
+};
+
+export const updateCompanyById = async (
+  id: string,
+  body: Omit<CompanyAdminType, "id" | "user_id">
+) => {
+  console.log("Updating company with ID:", id);
+  console.log("Update payload:", body);
+  const existingCompany = await db.query.company.findFirst({
+    where: eq(table.company.id, id),
+  });
+
+  if (!existingCompany) {
+    throw new Error("Company not found");
+  }
+
+  const [updatedCompany] = await db
+    .update(table.company)
+    .set(body)
+    .where(eq(table.company.id, id))
+    .returning();
 
   if (!updatedCompany) {
     throw new Error("Failed to update company");
