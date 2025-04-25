@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { adminAuthHandler } from "@/utils/adminAuthHandler";
-import { LayoutDashboard, FilePenLine, UserPen, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LayoutDashboard, FilePenLine, Settings } from "lucide-react";
 
 export default function AdminSidebar() {
+  const router = useRouter();
   const handleLogout = async () => {
     await adminAuthHandler("adminsignout");
+    router.push("/admin");
   };
 
   return (

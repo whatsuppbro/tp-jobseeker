@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import db from "@/db";
 import * as table from "@/db/schema";
-import { AdminType } from "@/db/models/admin";
+import { AdminType, AdminCreateType } from "@/db/models/admin";
 
 export const getAdmins = async () => {
   const admins = await db.query.admin.findMany({
@@ -66,7 +66,7 @@ export const getAdminById = async (id: string) => {
   return admin;
 };
 
-export const createAdmin = async (admin: AdminType) => {
+export const createAdmin = async (admin: AdminCreateType) => {
   const newAdmin = await db.insert(table.admin).values(admin).returning();
   return newAdmin;
 };

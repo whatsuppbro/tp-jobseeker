@@ -1,7 +1,7 @@
 import Elysia from "elysia";
 import { t } from "elysia";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
-import { AdminModel } from "@/db/models/admin";
+import { AdminModel, AdminCreateModel } from "@/db/models/admin";
 import { getAdminByEmail, createAdmin } from "@/services/admin";
 
 const controller = "admin";
@@ -53,7 +53,7 @@ export const adminController = new Elysia({
         }
       },
       {
-        body: AdminModel,
+        body: AdminCreateModel,
       }
     )
 );

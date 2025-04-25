@@ -18,7 +18,12 @@ export async function adminAuthHandler(
       throw new Error("Unauthorized: User is not an admin");
     }
 
-    cookieStore.set("admin", JSON.stringify(userData), {
+    const userWithRole = {
+      ...userData,
+      role: "admin",
+    };
+
+    cookieStore.set("user", JSON.stringify(userWithRole), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -26,6 +31,6 @@ export async function adminAuthHandler(
       maxAge: 60 * 60 * 24 * 7,
     });
   } else if (action === "adminsignout") {
-    cookieStore.delete("admin");
+    cookieStore.delete("user");
   }
 }

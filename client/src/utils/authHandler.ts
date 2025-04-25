@@ -14,7 +14,11 @@ export async function authHandler(
   const cookieStore = await cookies();
 
   if (action === "signin" && userData) {
-    cookieStore.set("user", JSON.stringify(userData), {
+    const userWithRole = {
+      ...userData,
+      role: "user",
+    };
+    cookieStore.set("user", JSON.stringify(userWithRole), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

@@ -2,26 +2,44 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const user = request.cookies.get("user")?.value;
-  const admin = request.cookies.get("admin")?.value;
+  const userCookie = request.cookies.get("user");
+  const user = userCookie?.value;
+
+  let userData = null;
+  if (user) {
+    try {
+      userData = JSON.parse(user);
+    } catch (error) {
+      console.error("Error parsing user cookie:", error);
+    }
+  }
+
   const pathname = request.nextUrl.pathname;
 
-  const protectedPaths = ["/signin", "/signup"];
-  const adminProtectedPaths = ["/admin"];
+  const isAdminRoot = pathname === "/admin";
 
-  if (protectedPaths.includes(pathname)) {
-    if (user) {
+  const isAdminSubpath =
+    pathname.startsWith("/admin/") && pathname !== "/admin";
+
+  const isPublicRoute = ["/signin", "/signup"].includes(pathname);
+
+  if (isAdminRoot) {
+    return NextResponse.next();
+  }
+
+  if (isAdminSubpath) {
+    if (!userData || userData.role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
-  if (adminProtectedPaths.includes(pathname)) {
-    if (admin) {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    }
 
-    return NextResponse.next();
+  if (userData && isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
+
+  return NextResponse.next();
 }
+
 export const config = {
-  matcher: ["/signin", "/signup", "/admin"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
