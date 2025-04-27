@@ -21,14 +21,22 @@ import { User } from "@/types/type";
 import { CustomPagination } from "@/components/AdminPagnation";
 import { StatCard } from "@/components/AdminStatCard";
 import UserModal from "@/components/AdminModal/UsersModal";
+import { Building, Users, Briefcase, FileUser} from "lucide-react"
+
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [companys, setCompanys] = useState<any[]>([]);
+  const [seekers, setSeekers] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const itemPerPage = 8;
+
+  const user = <Users />; 
+  const company = <Building />; 
+  const seeker = <FileUser />; 
+  const job = <Briefcase />; 
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -54,6 +62,23 @@ export default function AdminDashboard() {
         setLoading(false);
       }
     };
+
+    const fetchSeekers= async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/seeker`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data.");
+        }
+        const data = await response.json();
+        setSeekers(data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchSeekers();
 
     fetchUsers();
 
@@ -113,18 +138,27 @@ export default function AdminDashboard() {
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <StatCard
+          Icon={user}
           title="Total Users"
           description="Users registered in the system"
           value={users.length.toString()}
         />
         <StatCard
+          Icon={seeker}
+          title="Total Seeker"
+          description="Total number of seekers registered"
+          value={seekers.length.toString()}
+        />
+        <StatCard
+          Icon={company}
           title="Tocal Companies"
           description="Total number of companies registered"
           value={companys.length.toString()}
         />
         <StatCard
+          Icon={job}
           title="Total Jobs"
           description="Total number of jobs posted"
           value={jobs.length.toString()}
