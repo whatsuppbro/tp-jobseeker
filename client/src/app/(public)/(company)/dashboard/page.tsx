@@ -93,6 +93,11 @@ export default function Dashboard() {
     const { name, value } = e.target;
     setNewJob((prev) => ({ ...prev, [name]: value }));
   };
+  
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewJob((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handlePostJob = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +163,85 @@ export default function Dashboard() {
     );
   }
 
+  const locations = [
+    "Bangkok",
+    "Amnat Charoen",
+    "Ang Thong",
+    "Bueng Kan",
+    "Buri Ram",
+    "Chachoengsao",
+    "Chai Nat",
+    "Chaiyaphum",
+    "Chanthaburi",
+    "Chiang Mai",
+    "Chiang Rai",
+    "Chonburi",
+    "Chumphon",
+    "Kalasin",
+    "Kamphaeng Phet",
+    "Kanchanaburi",
+    "Khon Kaen",
+    "Krabi",
+    "Lampang",
+    "Lamphun",
+    "Loei",
+    "Lopburi",
+    "Mae Hong Son",
+    "Maha Sarakham",
+    "Mukdahan",
+    "Nakhon Nayok",
+    "Nakhon Pathom",
+    "Nakhon Phanom",
+    "Nakhon Ratchasima",
+    "Nakhon Sawan",
+    "Nakhon Si Thammarat",
+    "Nan",
+    "Narathiwat",
+    "Nong Bua Lamphu",
+    "Nong Khai",
+    "Nonthaburi",
+    "Pathum Thani",
+    "Pattani",
+    "Phang Nga",
+    "Phatthalung",
+    "Phayao",
+    "Phetchabun",
+    "Phetchaburi",
+    "Phichit",
+    "Phitsanulok",
+    "Phrae",
+    "Phuket",
+    "Prachinburi",
+    "Prachuap Khiri Khan",
+    "Ranong",
+    "Ratchaburi",
+    "Rayong",
+    "Roi Et",
+    "Sa Kaeo",
+    "Sakon Nakhon",
+    "Samut Prakan",
+    "Samut Sakhon",
+    "Samut Songkhram",
+    "Saraburi",
+    "Satun",
+    "Sing Buri",
+    "Sisaket",
+    "Songkhla",
+    "Sukhothai",
+    "Suphan Buri",
+    "Surat Thani",
+    "Surin",
+    "Tak",
+    "Trang",
+    "Trat",
+    "Ubon Ratchathani",
+    "Udon Thani",
+    "Uthai Thani",
+    "Uttaradit",
+    "Yala",
+    "Yasothon",
+  ];
+  
   return (
     <div className="container mx-auto px-4 py-12 space-y-12">
       <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
@@ -238,13 +322,22 @@ export default function Dashboard() {
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Location
             </label>
-            <Input
+            <select
               name="location"
               value={newJob.location}
-              onChange={handleInputChange}
-              placeholder="Job Location"
+              onChange={handleSelectChange}
               required
-            />
+              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-500"
+            >
+              <option value="" disabled >
+                Select a Location
+              </option>
+              {locations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">
@@ -301,6 +394,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       size="sm"
+                      className="cursor-pointer"
                       onClick={() => handleViewApplications(job.id)}
                     >
                       View Applications

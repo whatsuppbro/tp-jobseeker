@@ -119,11 +119,11 @@ export default function ApplicantId() {
                     value={seeker.experience.position}
                   />
                   <InfoRow
-                    label="company_name"
+                    label="Company"
                     value={seeker.experience.company_name}
                   />
                   <InfoRow
-                    label="description"
+                    label="Description"
                     value={seeker.experience.description}
                   />
                 </>

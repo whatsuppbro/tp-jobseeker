@@ -23,7 +23,7 @@ export async function adminAuthHandler(
       role: "admin",
     };
 
-    cookieStore.set("user", JSON.stringify(userWithRole), {
+    cookieStore.set("user-admin", JSON.stringify(userWithRole), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -31,6 +31,6 @@ export async function adminAuthHandler(
       maxAge: 60 * 60 * 24 * 7,
     });
   } else if (action === "adminsignout") {
-    cookieStore.delete("user");
+    cookieStore.delete("user-admin");
   }
 }
