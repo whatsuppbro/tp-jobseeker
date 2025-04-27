@@ -174,10 +174,17 @@ export default function ApplicationsDetails() {
           </p>
         </div>
         <div className="mt-6 flex gap-4">
-          <Button variant="destructive" onClick={handleDeleteJob}>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteJob}
+            className="cursor-pointer"
+          >
             Delete Job
           </Button>
-          <Button onClick={() => router.push("/dashboard")}>
+          <Button
+            onClick={() => router.push("/dashboard")}
+            className="cursor-pointer"
+          >
             Back to Dashboard
           </Button>
         </div>

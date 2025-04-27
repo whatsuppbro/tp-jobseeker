@@ -188,6 +188,37 @@ export default function ApplicantId() {
               )}
             </div>
           </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">Resume</h3>
+            <Separator className="my-2 bg-gray-200 h-px" />
+            <div className="space-y-2">
+              {seeker ? (
+                <>
+                  <InfoRow
+                    label="Resume"
+                    value={
+                      seeker?.resume_url ? (
+                        <a
+                          href={seeker?.resume_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          View Resume
+                        </a>
+                      ) : (
+                        "Not provided"
+                      )
+                    }
+                  />
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  Resume information not found.
+                </p>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

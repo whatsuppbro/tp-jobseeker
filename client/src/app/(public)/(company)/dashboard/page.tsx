@@ -271,7 +271,9 @@ export default function Dashboard() {
               required
             />
           </div>
-          <Button type="submit">Post Job</Button>
+          <Button type="submit" className="cursor-pointer">
+            Post Job
+          </Button>
         </form>
       </div>
 

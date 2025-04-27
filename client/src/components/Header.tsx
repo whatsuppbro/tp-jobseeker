@@ -103,30 +103,44 @@ export default function Header() {
           {isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <User className="h-4 w-4" />
                   {user?.email}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => router.push("/setting")}>
+                <DropdownMenuItem
+                  onClick={() => router.push("/setting")}
+                  className="cursor-pointer"
+                >
                   Setting
                 </DropdownMenuItem>
 
                 {user?.role === "seeker" && (
                   <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={() => router.push("/job/applied-jobs")}
                   >
                     Applied Jobs
                   </DropdownMenuItem>
                 )}
                 {user?.role === "company" && (
-                  <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard")}
+                    className="cursor-pointer"
+                  >
                     Dashboard
                   </DropdownMenuItem>
                 )}
                 <Separator />
-                <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleLogout}
+                  className="cursor-pointer"
+                >
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -145,16 +159,16 @@ export default function Header() {
           )}
         </div>
 
-        <div className="md:hidden">
+        <div className="md:hidden ">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" className="cursor-pointer">
                 <AlignJustify className="h-5 w-5" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {navList.map((navItem, i) => (
-                <DropdownMenuItem key={i}>
+                <DropdownMenuItem key={i} className="cursor-pointer">
                   <Link href={navItem.href} className="w-full">
                     {navItem.name}
                   </Link>
@@ -163,19 +177,26 @@ export default function Header() {
               <Separator />
               {isLoggedIn ? (
                 <>
-                  <DropdownMenuItem onClick={() => router.push("/setting")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/setting")}
+                    className="cursor-pointer"
+                  >
                     Setting
                   </DropdownMenuItem>
 
                   {user?.role === "seeker" && (
                     <DropdownMenuItem
                       onClick={() => router.push("/job/applied-jobs")}
+                      className="cursor-pointer"
                     >
                       Applied Jobs
                     </DropdownMenuItem>
                   )}
                   {user?.role === "company" && (
-                    <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard")}
+                      className="cursor-pointer"
+                    >
                       Dashboard
                     </DropdownMenuItem>
                   )}
@@ -183,18 +204,19 @@ export default function Header() {
                   <DropdownMenuItem
                     variant="destructive"
                     onClick={handleLogout}
+                    className="cursor-pointer"
                   >
                     Logout
                   </DropdownMenuItem>
                 </>
               ) : (
                 <>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
                     <Link href="/login" className="w-full">
                       Login
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
                     <Link href="/signup" className="w-full">
                       Sign Up
                     </Link>
