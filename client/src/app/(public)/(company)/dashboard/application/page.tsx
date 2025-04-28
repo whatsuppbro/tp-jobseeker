@@ -213,6 +213,7 @@ export default function ApplicationsDetails() {
                   <TableCell>{application.status}</TableCell>
                   <TableCell>
                     <Button
+                      style={{ cursor: 'pointer' }}
                       onClick={() =>
                         router.push(
                           `/dashboard/application/${application.user.id}`
@@ -226,6 +227,7 @@ export default function ApplicationsDetails() {
                     {application.status === "pending" && (
                       <div className="flex gap-2">
                         <Button
+                          style={{ cursor: 'pointer' }}
                           size="sm"
                           onClick={() =>
                             handleUpdateApplicationStatus(
@@ -237,6 +239,7 @@ export default function ApplicationsDetails() {
                           Accept
                         </Button>
                         <Button
+                          style={{ cursor: 'pointer' }}
                           size="sm"
                           variant="destructive"
                           onClick={() =>

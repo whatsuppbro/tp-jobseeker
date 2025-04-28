@@ -10,7 +10,7 @@ export const getJobs = async () => {
       applications: true,
     },
     columns: {
-      created_at: false,
+      
       updated_at: false,
     },
   });
@@ -20,7 +20,6 @@ export const getJobs = async () => {
 export const getAllJobs = async () => {
   const jobs = await db.query.jobs.findMany({
     columns: {
-      created_at: false,
       updated_at: false,
     },
   });
@@ -35,7 +34,6 @@ export const getJobsById = async (id: string) => {
       applications: { with: { user: true } },
     },
     columns: {
-      created_at: false,
       updated_at: false,
     },
   });
@@ -54,7 +52,6 @@ export const getJobsByCompanyId = async (companyId: string) => {
       },
     },
     columns: {
-      created_at: false,
       updated_at: false,
     },
   });
