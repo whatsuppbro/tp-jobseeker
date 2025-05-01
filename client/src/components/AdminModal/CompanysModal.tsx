@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Edit, Trash, CheckCircle2 } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 import { Company } from "@/types/type";
 import { Separator } from "@/components/ui/separator";
 
@@ -22,55 +22,39 @@ export default function CompanyModal({ Id, Data }: ModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    company_name: Data.company_name,
-    company_email: Data.company_email,
-    company_phone: Data.company_phone,
-    company_website: Data.company_website,
-    company_description: Data.company_description,
-    company_address: Data.company_address,
-    company_city: Data.company_city,
-    company_country: Data.company_country,
-    is_verified: Data.is_verified,
+    company_name: "",
+    company_description: "",
+    company_website: "",
+    company_email: "",
+    company_phone: "",
+    company_address: "",
+    company_city: "",
+    company_country: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (Data) {
+      setFormData({
+        company_name: Data.company_name || "",
+        company_description: Data.company_description || "",
+        company_website: Data.company_website || "",
+        company_email: Data.company_email || "",
+        company_phone: Data.company_phone || "",
+        company_address: Data.company_address || "",
+        company_city: Data.company_city || "",
+        company_country: Data.company_country || "",
+      });
+    }
+  }, [Data]);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleVerify = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/company/${Id}/verify`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            is_verified: true,
-            verified_at: new Date().toISOString(),
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to verify company");
-      }
-
-      toast.success("Company verified successfully!");
-      setIsOpen(false);
-      window.location.reload();
-    } catch (error) {
-      console.error("Error verifying company:", error);
-      toast.error("Failed to verify company");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,26 +63,33 @@ export default function CompanyModal({ Id, Data }: ModalProps) {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/company/${Id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/company/company/${Id}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: Data.id,
+            company_name: formData.company_name,
+            company_description: formData.company_description,
+            company_website: formData.company_website,
+            company_email: formData.company_email,
+            company_phone: formData.company_phone,
+            company_address: formData.company_address,
+            company_city: formData.company_city,
+            company_country: formData.company_country,
+            image_url: Data.image_url || "",
+          }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update company");
-      }
+      if (!response.ok) throw new Error("Failed to update");
 
-      toast.success("Company updated successfully!");
+      toast.success("updated successfully");
       setIsOpen(false);
       window.location.reload();
     } catch (error) {
-      console.error("Error updating company:", error);
-      toast.error("Failed to update company");
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -145,15 +136,9 @@ export default function CompanyModal({ Id, Data }: ModalProps) {
             onChange={handleChange}
           />
           <Input
-            name="company_email"
-            placeholder="Enter company email"
-            value={formData.company_email}
-            onChange={handleChange}
-          />
-          <Input
-            name="company_phone"
-            placeholder="Enter company phone"
-            value={formData.company_phone}
+            name="company_description"
+            placeholder="Enter company description"
+            value={formData.company_description}
             onChange={handleChange}
           />
           <Input
@@ -163,9 +148,15 @@ export default function CompanyModal({ Id, Data }: ModalProps) {
             onChange={handleChange}
           />
           <Input
-            name="company_description"
-            placeholder="Enter company description"
-            value={formData.company_description}
+            name="company_email"
+            placeholder="Enter company email"
+            value={formData.company_email}
+            onChange={handleChange}
+          />
+          <Input
+            name="company_phone"
+            placeholder="Enter company phone number"
+            value={formData.company_phone}
             onChange={handleChange}
           />
           <Input
@@ -187,22 +178,9 @@ export default function CompanyModal({ Id, Data }: ModalProps) {
             onChange={handleChange}
           />
 
-          <div className="flex justify-between gap-2">
-            {!formData.is_verified && (
-              <Button
-                type="button"
-                onClick={handleVerify}
-                disabled={isLoading}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                Verify Company
-              </Button>
-            )}
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Update"}
-            </Button>
-          </div>
+          <Button type="submit" disabled={isLoading} className="w-full">
+            {isLoading ? "Updating..." : "Update"}
+          </Button>
         </form>
         <Separator className="py-1 rounded-2xl bg-gray-200" />
         <div className="flex justify-end gap-2">

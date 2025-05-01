@@ -10,7 +10,14 @@ export const verification = pgTable("verification", {
     .unique(),
   verified_url: text("verified_url").notNull(),
   verified_description: text("verified_description"),
-  status: text("status", { enum: ["unverified", "verified"] }).notNull(),
+  document_url: text("document_url"),
+  document_type: text("document_type", { 
+    enum: ["business_license", "tax_id", "company_registration", "other"] 
+  }),
+  rejection_reason: text("rejection_reason"),
+  status: text("status", { 
+    enum: ["unverified", "pending", "verified", "rejected"] 
+  }).notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at")
     .defaultNow()

@@ -21,10 +21,20 @@ import { toast } from "sonner";
 import { Company } from "@/types/type";
 import CompanyModal from "@/components/AdminModal/CompanysModal";
 import { Input } from "@/components/ui/input";
-import { Building, Users, Briefcase, FileUser, Search, CheckCircle2 } from "lucide-react";
+import { Building, Users, Briefcase, FileUser, Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+
+interface CompanyWithVerification extends Company {
+  verification?: {
+    status: string;
+    document_url?: string;
+    document_type?: string;
+    rejection_reason?: string;
+  };
+}
 
 export default function AdminCompany() {
-  const [data, setData] = useState<Company[]>([]);
+  const [data, setData] = useState<CompanyWithVerification[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchEmail, setSearchEmail] = useState<string>("");
@@ -42,7 +52,26 @@ export default function AdminCompany() {
         const data = await response.json();
 
         if (Array.isArray(data.data)) {
-          setData(data.data);
+          // Fetch verification status for each company
+          const companiesWithVerification = await Promise.all(
+            data.data.map(async (company: Company) => {
+              const verificationResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/company/${company.id}/verification`
+              );
+              if (verificationResponse.ok) {
+                const verificationData = await verificationResponse.json();
+                return {
+                  ...company,
+                  verification: verificationData.data,
+                };
+              }
+              return {
+                ...company,
+                verification: { status: "unverified" },
+              };
+            })
+          );
+          setData(companiesWithVerification);
         } else {
           console.error("Unexpected data format:", data);
           toast.error("Unexpected data format received from the server.");
@@ -59,6 +88,49 @@ export default function AdminCompany() {
 
     fetchData();
   }, []);
+
+  const handleVerification = async (companyId: string, action: string, reason?: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/verification/${companyId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ action, reason }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update verification status");
+      }
+
+      toast.success("Verification status updated successfully");
+      // Refresh data
+      const updatedResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/company`
+      );
+      const updatedData = await updatedResponse.json();
+      setData(updatedData.data);
+    } catch (error) {
+      console.error("Error updating verification:", error);
+      toast.error("Failed to update verification status");
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "verified":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   const indexOfLastUser = currentPage * itemPerPage;
   const indexOfFirstUser = indexOfLastUser - itemPerPage;
@@ -106,36 +178,58 @@ export default function AdminCompany() {
                 <TableHead className="w-[250px]">Email</TableHead>
                 <TableHead className="w-[150px]">Phone</TableHead>
                 <TableHead className="w-[150px]">City</TableHead>
-                <TableHead className="w-[100px]">Status</TableHead>
+                <TableHead className="w-[150px]">Verification</TableHead>
                 <TableHead className="w-[150px] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentUsers.length > 0 ? (
-                currentUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.company_name}</TableCell>
-                    <TableCell>{user.company_email}</TableCell>
-                    <TableCell>{user.company_phone}</TableCell>
-                    <TableCell>{user.company_city}</TableCell>
+                currentUsers.map((company) => (
+                  <TableRow key={company.id}>
+                    <TableCell>{company.company_name}</TableCell>
+                    <TableCell>{company.company_email}</TableCell>
+                    <TableCell>{company.company_phone}</TableCell>
+                    <TableCell>{company.company_city}</TableCell>
                     <TableCell>
-                      {user.is_verified ? (
-                        <div className="flex items-center text-green-600">
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
-                          Verified
-                        </div>
-                      ) : (
-                        <span className="text-orange-500">Pending</span>
-                      )}
+                      <Badge className={getStatusColor(company.verification?.status || "unverified")}>
+                        {company.verification?.status || "Unverified"}
+                      </Badge>
                     </TableCell>
                     <TableCell className="flex justify-center gap-2">
-                      <CompanyModal Id={user.id} Data={user} />
+                      <CompanyModal Id={company.id} Data={company} />
+                      {company.verification?.status === "pending" && (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleVerification(company.id, "approve")}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleVerification(company.id, "reject", "Document verification failed")}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      )}
+                      {company.verification?.document_url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(company.verification?.document_url, "_blank")}
+                        >
+                          View Document
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-gray-500">
+                  <TableCell colSpan={6} className="text-center text-gray-500">
                     No data found.
                   </TableCell>
                 </TableRow>
