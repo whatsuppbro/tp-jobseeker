@@ -14,6 +14,7 @@ import Link from "next/link";
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -26,6 +27,8 @@ export default function Page() {
     keyword: "",
     jobType: "All",
     location: "All",
+    minSalary: "",
+    maxSalary: "",
   });
 
   const [jobs, setJobs] = useState<any[]>([]);
@@ -82,7 +85,11 @@ export default function Page() {
       filters.location === "All" ||
       (job.location?.toLowerCase() || "") === filters.location.toLowerCase();
 
-    return matchesKeyword && matchesJobType && matchesLocation;
+    const matchesSalary = 
+      (!filters.minSalary || Number(job.salary) >= Number(filters.minSalary)) &&
+      (!filters.maxSalary || Number(job.salary) <= Number(filters.maxSalary));
+
+    return matchesKeyword && matchesJobType && matchesLocation && matchesSalary;
   });
 
   const indexOfLastJob = currentPage * jobsPerPage;
@@ -118,6 +125,8 @@ export default function Page() {
               keyword: newFilters.keyword,
               jobType: newFilters.jobType,
               location: newFilters.location,
+              minSalary: newFilters.minSalary,
+              maxSalary: newFilters.maxSalary,
             });
             setCurrentPage(1);
           }}
@@ -128,15 +137,24 @@ export default function Page() {
         {currentJobs.length > 0 ? (
           <ul className="space-y-4">
             {currentJobs.map((job) => {
-              const createdAt = job.created_at
-                ? new Date(job.created_at)
-                : null;
-              const diffInDays = createdAt
-                ? Math.floor(
-                    (new Date().getTime() - createdAt.getTime()) /
-                      (1000 * 60 * 60 * 24)
-                  )
-                : null;
+              const createdAt = job.created_at ? new Date(job.created_at) : null;
+              let timeAgo = "Date unavailable";
+              if (createdAt) {
+                const now = new Date();
+                const diffMs = now.getTime() - createdAt.getTime();
+                const diffInMinutes = Math.floor(diffMs / (1000 * 60));
+                const diffInHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffInDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                if (diffInDays >= 1) {
+                  timeAgo = `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`;
+                } else if (diffInHours >= 1) {
+                  timeAgo = `${diffInHours} hour${diffInHours === 1 ? "" : "s"} ago`;
+                } else if (diffInMinutes >= 1) {
+                  timeAgo = `${diffInMinutes} minute${diffInMinutes === 1 ? "" : "s"} ago`;
+                } else {
+                  timeAgo = "Just now";
+                }
+              }
 
               return (
                 <Link href={`/job/${job.id}`} key={job.id}>
@@ -189,9 +207,7 @@ export default function Page() {
                         </div>
                         <div className="flex justify-between items-center w-full">
                           <span className="text-sm text-gray-500">
-                            {diffInDays !== null
-                              ? `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`
-                              : "Date unavailable"}
+                            {timeAgo}
                           </span>
                         </div>
                       </div>

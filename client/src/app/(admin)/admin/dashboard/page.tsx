@@ -22,6 +22,7 @@ import { CustomPagination } from "@/components/AdminPagnation";
 import { StatCard } from "@/components/AdminStatCard";
 import UserModal from "@/components/AdminModal/UsersModal";
 import { Building, Users, Briefcase, FileUser} from "lucide-react"
+import { useRouter } from "next/navigation";
 
 
 export default function AdminDashboard() {
@@ -32,11 +33,28 @@ export default function AdminDashboard() {
   const [seekers, setSeekers] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const itemPerPage = 8;
+  const router = useRouter();
 
   const user = <Users />; 
   const company = <Building />; 
   const seeker = <FileUser />; 
   const job = <Briefcase />; 
+
+  useEffect(() => {
+    const adminData = localStorage.getItem("admin");
+    if (!adminData) {
+      router.push("/admin");
+      return;
+    }
+    try {
+      const admin = JSON.parse(adminData);
+      if (admin.role !== "admin") {
+        router.push("/admin");
+      }
+    } catch (e) {
+      router.push("/admin");
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchUsers = async () => {

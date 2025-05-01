@@ -14,6 +14,18 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  const adminCookie = request.cookies.get("admin");
+  const admin = adminCookie?.value;
+
+  let adminData = null;
+  if (admin) {
+    try {
+      adminData = JSON.parse(admin);
+    } catch (error) {
+      console.error("Error parsing admin cookie:", error);
+    }
+  }
+
   const pathname = request.nextUrl.pathname;
 
   const isAdminRoot = pathname === "/admin";
@@ -28,7 +40,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (isAdminSubpath) {
-    if (!userData || userData.role !== "admin") {
+    if (!adminData || adminData.role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

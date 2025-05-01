@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/card";
 import ApplyButtonWrapper from "@/components/ApplyButton";
 import { JobwithCompany } from "@/types/type";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function JobDetail({
   params,
@@ -82,10 +84,26 @@ export default async function JobDetail({
         </Card>
 
         <ApplyButtonWrapper jobId={job.id} applications={job.applications} />
+        <ShowSignUpButtonIfNotLoggedIn />
       </div>
     );
   } catch (error) {
     console.error("Error fetching job details:", error);
     return redirect("/#");
   }
+}
+
+function ShowSignUpButtonIfNotLoggedIn() {
+  if (typeof window !== "undefined" && !localStorage.getItem("user")) {
+    return (
+      <div className="flex justify-center mt-8">
+        <Link href="/signup">
+          <Button size="lg" className="bg-green-600 text-white hover:bg-green-700">
+            Sign Up to Apply
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+  return null;
 }
