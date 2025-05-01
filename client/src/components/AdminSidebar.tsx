@@ -5,7 +5,16 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { adminAuthHandler } from "@/utils/adminAuthHandler";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, FilePenLine, Settings } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  FilePenLine, 
+  Settings, 
+  LogOut,
+  Shield,
+  Building,
+  FileText,
+  CheckCircle
+} from "lucide-react";
 
 export default function AdminSidebar() {
   const router = useRouter();
@@ -46,7 +55,7 @@ export default function AdminSidebar() {
               variant="ghost"
               className="w-full justify-start cursor-pointer"
             >
-              <Settings className="mr-2" />
+              <Building className="mr-2" />
               Company
             </Button>
           </Link>
@@ -55,8 +64,17 @@ export default function AdminSidebar() {
               variant="ghost"
               className="w-full justify-start cursor-pointer"
             >
-              <Settings className="mr-2" />
+              <FileText className="mr-2" />
               Applications
+            </Button>
+          </Link>
+          <Link href="/admin/verification">
+            <Button
+              variant="ghost"
+              className="w-full justify-start cursor-pointer"
+            >
+              <CheckCircle className="mr-2" />
+              Verification
             </Button>
           </Link>
         </nav>

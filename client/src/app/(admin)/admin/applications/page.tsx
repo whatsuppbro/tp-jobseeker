@@ -20,11 +20,14 @@ import { CustomPagination } from "@/components/AdminPagnation";
 import { toast } from "sonner";
 import { ApplicantionByUser } from "@/types/type";
 import ApplicationModal from "@/components/AdminModal/ApplicationModal";
+import { Input } from "@/components/ui/input";
+import { Building, Users, Briefcase, FileUser, Search } from "lucide-react";
 
 export default function AdminApplications() {
   const [data, setData] = useState<ApplicantionByUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchEmail, setSearchEmail] = useState<string>("");
   const itemPerPage = 8;
 
   useEffect(() => {
@@ -57,7 +60,10 @@ export default function AdminApplications() {
 
   const indexOfLastUser = currentPage * itemPerPage;
   const indexOfFirstUser = indexOfLastUser - itemPerPage;
-  const currentUsers = data.slice(indexOfFirstUser, indexOfLastUser);
+  const filteredData = data.filter(application => 
+    application.job.company.company_email.toLowerCase().includes(searchEmail.toLowerCase())
+  );
+  const currentUsers = filteredData.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -73,8 +79,22 @@ export default function AdminApplications() {
     <div className="container mx-auto px-4 py-12">
       <Card className="shadow-md border border-gray-200 ">
         <CardHeader>
-          <CardTitle>Applications Management</CardTitle>
-          <CardDescription>List of all registered Applications</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Applications Management</CardTitle>
+              <CardDescription>List of all registered Applications</CardDescription>
+            </div>
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="Search by company email..."
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                className="max-w-sm pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -126,7 +146,7 @@ export default function AdminApplications() {
 
           <div className="flex justify-center mt-6">
             <CustomPagination
-              totalUsers={data.length}
+              totalUsers={filteredData.length}
               itemPerPage={itemPerPage}
               currentPage={currentPage}
               paginate={paginate}

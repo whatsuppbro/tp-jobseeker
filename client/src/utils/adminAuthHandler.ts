@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 interface Admin {
   email: string;
   password: string;
-  is_admin: boolean;
+  role: string;
 }
 
 export async function adminAuthHandler(
@@ -14,7 +14,7 @@ export async function adminAuthHandler(
   const cookieStore = await cookies();
 
   if (action === "adminsignin" && userData) {
-    if (!userData.is_admin) {
+    if (!userData.role) {
       throw new Error("Unauthorized: User is not an admin");
     }
 
@@ -23,7 +23,7 @@ export async function adminAuthHandler(
       role: "admin",
     };
 
-    cookieStore.set("user-admin", JSON.stringify(userWithRole), {
+    cookieStore.set("admin", JSON.stringify(userWithRole), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -31,6 +31,6 @@ export async function adminAuthHandler(
       maxAge: 60 * 60 * 24 * 7,
     });
   } else if (action === "adminsignout") {
-    cookieStore.delete("user-admin");
+    cookieStore.delete("admin");
   }
 }

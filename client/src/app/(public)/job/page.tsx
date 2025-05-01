@@ -27,6 +27,8 @@ export default function Page() {
     keyword: "",
     jobType: "All",
     location: "All",
+    minSalary: "",
+    maxSalary: "",
   });
 
   const [jobs, setJobs] = useState<any[]>([]);
@@ -83,7 +85,11 @@ export default function Page() {
       filters.location === "All" ||
       (job.location?.toLowerCase() || "") === filters.location.toLowerCase();
 
-    return matchesKeyword && matchesJobType && matchesLocation;
+    const matchesSalary = 
+      (!filters.minSalary || Number(job.salary) >= Number(filters.minSalary)) &&
+      (!filters.maxSalary || Number(job.salary) <= Number(filters.maxSalary));
+
+    return matchesKeyword && matchesJobType && matchesLocation && matchesSalary;
   });
 
   const indexOfLastJob = currentPage * jobsPerPage;
@@ -119,6 +125,8 @@ export default function Page() {
               keyword: newFilters.keyword,
               jobType: newFilters.jobType,
               location: newFilters.location,
+              minSalary: newFilters.minSalary,
+              maxSalary: newFilters.maxSalary,
             });
             setCurrentPage(1);
           }}
@@ -128,60 +136,86 @@ export default function Page() {
       <div className="max-w-6xl mx-auto p-4">
         {currentJobs.length > 0 ? (
           <ul className="space-y-4">
-            {currentJobs.map((job) => (
-              <Link href={`/job/${job.id}`} key={job.id}>
-                <Card className="hover:bg-muted transition-colors duration-300 my-4 shadow-md rounded-lg cursor-pointer gap-0">
-                  <div className="px-6">
-                    <CardHeader className=" flex flex-col items-start justify-between p-4">
-                      <CardTitle className="text-lg font-semibold text-gray-800">
-                        <img
-                          src={
-                            job.company.image_url ||
-                            "https://png.pngtree.com/png-clipart/20230926/original/pngtree-unknown-user-warning-black-glyph-icon-digital-design-logo-vector-png-image_12785034.png"
-                          }
-                          alt={`${job.company.company_name} logo`}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                        <h1 className="text-2xl text-black">{job.title}</h1>
-                      </CardTitle>
-                    </CardHeader>
-                  </div>
-                  <CardDescription className="text-sm px-6 text-gray-600">
-                    <div className="flex justify-between items-center px-4">
-                      <span className="text-sm text-gray-900 ">
-                        {job.description}
-                      </span>
+            {currentJobs.map((job) => {
+              const createdAt = job.created_at ? new Date(job.created_at) : null;
+              let timeAgo = "Date unavailable";
+              if (createdAt) {
+                const now = new Date();
+                const diffMs = now.getTime() - createdAt.getTime();
+                const diffInMinutes = Math.floor(diffMs / (1000 * 60));
+                const diffInHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffInDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                if (diffInDays >= 1) {
+                  timeAgo = `${diffInDays} day${diffInDays === 1 ? "" : "s"} ago`;
+                } else if (diffInHours >= 1) {
+                  timeAgo = `${diffInHours} hour${diffInHours === 1 ? "" : "s"} ago`;
+                } else if (diffInMinutes >= 1) {
+                  timeAgo = `${diffInMinutes} minute${diffInMinutes === 1 ? "" : "s"} ago`;
+                } else {
+                  timeAgo = "Just now";
+                }
+              }
+
+              return (
+                <Link href={`/job/${job.id}`} key={job.id}>
+                  <Card className="hover:bg-muted transition-colors duration-300 my-4 shadow-md rounded-lg cursor-pointer gap-0 px-4 w-full">
+                    <div className="px-4">
+                      <CardHeader className="flex flex-col items-start justify-between p-1.5">
+                        <CardTitle className="text-lg font-semibold text-gray-800 w-full">
+                          <div className="flex justify-between items-center w-full">
+                            <div className="flex flex-col items-start gap-1">
+                              <h1 className="text-2xl text-black">
+                                {job.title}
+                              </h1>
+                              <span className="text-base text-gray-500">
+                                {job.company.company_name}
+                              </span>
+                            </div>
+                            <img
+                              src={
+                                job.company.image_url ||
+                                "https://png.pngtree.com/png-clipart/20230926/original/pngtree-unknown-user-warning-black-glyph-icon-digital-design-logo-vector-png-image_12785034.png"
+                              }
+                              alt={`${job.company.company_name} logo`}
+                              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                            />
+                          </div>
+                        </CardTitle>
+                      </CardHeader>
                     </div>
-                  </CardDescription>
-                  <CardContent className="flex flex-col justify-between h-full">
-                    <div className="p-4 space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-900">
-                          Company: {job.company.company_name}
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="text-green-600 font-medium"
-                        >
-                          ${job.salary}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-900">
+                    <CardDescription className="text-base px-4 text-gray-600">
+                      <div className="flex flex-col gap-2 px-2">
+                        <div className="flex justify-between items-center w-full">
+                          <span className="text-base text-gray-900 line-clamp-2">
+                            {job.description}
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="text-green-600 font-medium text-base ml-2"
+                          >
+                            ${job.salary}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center w-full">
                           <div className="flex items-center gap-1 text-gray-500">
-                            <MapPin size={15} />
+                            <MapPin size={18} />
                             {job.location}
                           </div>
-                        </span>
-                        <span className="text-sm text-gray-900">
-                          Type: {job.job_type}
-                        </span>
+                          <span className="text-base text-gray-900 ml-2">
+                            Type: {job.job_type}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center w-full">
+                          <span className="text-sm text-gray-500">
+                            {timeAgo}
+                          </span>
+                        </div>
                       </div>
-                    </div>{" "}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                    </CardDescription>
+                  </Card>
+                </Link>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-center text-gray-600">No jobs found.</p>
@@ -191,7 +225,9 @@ export default function Page() {
           <PaginationContent className="cursor-pointer">
             <PaginationItem>
               <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
               />
             </PaginationItem>
             {Array.from(

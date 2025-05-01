@@ -21,6 +21,14 @@ interface User {
   role: "seeker" | "company";
   seeker: {
     id: string;
+    resume_url?: string;
+    skills?: { id: string; name: string }[];
+    education?: {
+      id: string;
+      school_name: string;
+      degree: string;
+      field_of_study: string;
+    }[];
   };
 }
 
@@ -80,6 +88,28 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
       }
 
       const parsedUser = JSON.parse(userData);
+      
+      // Check if user has resume
+      if (!user?.seeker?.resume_url) {
+        toast.error("Please upload your resume before applying.");
+        router.push("/profile/edit");
+        return;
+      }
+
+      // Check if user has skills
+      if (!user?.seeker?.skills || user.seeker.skills.length === 0) {
+        toast.error("Please add at least one skill to your profile.");
+        router.push("/profile");
+        return;
+      }
+
+      // Check if user has education
+      if (!user?.seeker?.education || user.seeker.education.length === 0) {
+        toast.error("Please add your education information.");
+        router.push("/profile");
+        return;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/applications`,
         {

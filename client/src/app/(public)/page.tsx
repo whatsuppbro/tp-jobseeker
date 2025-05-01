@@ -72,8 +72,7 @@ export default function HomePage() {
                   <h3 className="text-xl font-semibold mb-2 text-green-950">
                     {job.title}
                   </h3>
-
-                  <p className="text-sm text-gray-500 mt-2">{job.location}</p>
+                  <p className="text-sm text-gray-500 mt-2 font-semibold">{job.location}</p>
                   <p className="text-sm text-gray-500 mt-2">
                     Salary:{" "}
                     <span className="font-medium text-green-600">
@@ -114,8 +113,7 @@ export default function HomePage() {
             <PencilRuler className="mx-auto mb-4" size={80} />
             <h3 className="text-xl font-semibold mb-2">Create Your Profile</h3>
             <p className="text-gray-600">
-              Build a professional profile that showcases your skills and
-              experience.
+              Build a professional profile.
             </p>
           </div>
           <div className="text-center">

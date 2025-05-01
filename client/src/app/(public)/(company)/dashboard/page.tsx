@@ -14,6 +14,13 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Company, Job } from "@/types/type";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -322,22 +329,24 @@ export default function Dashboard() {
             <label className="block text-sm font-medium text-gray-500 mb-1">
               Location
             </label>
-            <select
-              name="location"
+            <Select
               value={newJob.location}
-              onChange={handleSelectChange}
-              required
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm text-gray-500"
+              onValueChange={(value) => setNewJob((prev) => ({ ...prev, location: value }))}
             >
-              <option value="" disabled >
-                Select a Location
-              </option>
-              {locations.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full bg-white flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground">
+                <SelectValue placeholder="Select a Location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem key="placeholder-location" value="placeholder" disabled>
+                  Select a Location
+                </SelectItem>
+                {locations.map((loc) => (
+                  <SelectItem key={loc} value={loc}>
+                    {loc}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">

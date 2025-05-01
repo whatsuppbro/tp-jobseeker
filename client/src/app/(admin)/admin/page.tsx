@@ -60,19 +60,19 @@ export default function Login() {
         throw new Error(data.message || "Login failed");
       }
 
-      const { id, email, password, is_admin } = data.data;
+      const { id, email, password, role } = data.data;
       await adminAuthHandler("adminsignin", data.data);
 
       localStorage.setItem(
         "admin",
-        JSON.stringify({ id, email, password, is_admin })
+        JSON.stringify({ id, email, password, role})
       );
 
       window.dispatchEvent(new Event("storage"));
 
       toast.success("Login successful!");
 
-      if (is_admin === true) {
+      if (role === "admin") {
         router.push("/admin/dashboard");
       }
     } catch (error) {
@@ -99,7 +99,7 @@ export default function Login() {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="johndoe@mail.com"
+                      placeholder="username"
                       type="email"
                       autoComplete="email"
                       {...field}
