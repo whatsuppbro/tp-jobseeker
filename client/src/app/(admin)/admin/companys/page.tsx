@@ -20,11 +20,14 @@ import { CustomPagination } from "@/components/AdminPagnation";
 import { toast } from "sonner";
 import { Company } from "@/types/type";
 import CompanyModal from "@/components/AdminModal/CompanysModal";
+import { Input } from "@/components/ui/input";
+import { Building, Users, Briefcase, FileUser, Search, CheckCircle2 } from "lucide-react";
 
 export default function AdminCompany() {
   const [data, setData] = useState<Company[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchEmail, setSearchEmail] = useState<string>("");
   const itemPerPage = 8;
 
   useEffect(() => {
@@ -59,7 +62,10 @@ export default function AdminCompany() {
 
   const indexOfLastUser = currentPage * itemPerPage;
   const indexOfFirstUser = indexOfLastUser - itemPerPage;
-  const currentUsers = data.slice(indexOfFirstUser, indexOfLastUser);
+  const filteredData = data.filter(company => 
+    company.company_email.toLowerCase().includes(searchEmail.toLowerCase())
+  );
+  const currentUsers = filteredData.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -75,8 +81,22 @@ export default function AdminCompany() {
     <div className="container mx-auto px-4 py-12">
       <Card className="shadow-md border border-gray-200 ">
         <CardHeader>
-          <CardTitle>Company Management</CardTitle>
-          <CardDescription>List of all registered Company</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Company Management</CardTitle>
+              <CardDescription>List of all registered Company</CardDescription>
+            </div>
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="Search by company email..."
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                className="max-w-sm pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -86,6 +106,7 @@ export default function AdminCompany() {
                 <TableHead className="w-[250px]">Email</TableHead>
                 <TableHead className="w-[150px]">Phone</TableHead>
                 <TableHead className="w-[150px]">City</TableHead>
+                <TableHead className="w-[100px]">Status</TableHead>
                 <TableHead className="w-[150px] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -96,8 +117,17 @@ export default function AdminCompany() {
                     <TableCell>{user.company_name}</TableCell>
                     <TableCell>{user.company_email}</TableCell>
                     <TableCell>{user.company_phone}</TableCell>
-                    <TableCell>{user.company_email}</TableCell>
-
+                    <TableCell>{user.company_city}</TableCell>
+                    <TableCell>
+                      {user.is_verified ? (
+                        <div className="flex items-center text-green-600">
+                          <CheckCircle2 className="h-4 w-4 mr-1" />
+                          Verified
+                        </div>
+                      ) : (
+                        <span className="text-orange-500">Pending</span>
+                      )}
+                    </TableCell>
                     <TableCell className="flex justify-center gap-2">
                       <CompanyModal Id={user.id} Data={user} />
                     </TableCell>
@@ -115,7 +145,7 @@ export default function AdminCompany() {
 
           <div className="flex justify-center mt-6">
             <CustomPagination
-              totalUsers={data.length}
+              totalUsers={filteredData.length}
               itemPerPage={itemPerPage}
               currentPage={currentPage}
               paginate={paginate}

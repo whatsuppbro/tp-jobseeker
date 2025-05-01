@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -254,9 +255,22 @@ export default function Dashboard() {
       <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
         <h2 className="text-2xl font-semibold mb-4">Company Details</h2>
         <div className="space-y-4">
-          <p>
-            <strong>Name:</strong> {company.company_name}
-          </p>
+          <div className="flex items-center justify-between">
+            <p>
+              <strong>Name:</strong> {company.company_name}
+            </p>
+            {company.is_verified ? (
+              <div className="flex items-center text-green-600">
+                <CheckCircle2 className="h-5 w-5 mr-1" />
+                Verified
+              </div>
+            ) : (
+              <div className="flex items-center text-orange-500">
+                <AlertCircle className="h-5 w-5 mr-1" />
+                Pending Verification
+              </div>
+            )}
+          </div>
 
           <p>
             <strong>Description:</strong> {company.company_description}
@@ -283,6 +297,29 @@ export default function Dashboard() {
             {company.company_city}, {company.company_country}
           </p>
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Your Jobs</h2>
+          {!company.is_verified && (
+            <div className="text-orange-500 text-sm">
+              Your company needs to be verified before posting jobs
+            </div>
+          )}
+        </div>
+        {company.is_verified ? (
+          <Button
+            onClick={() => router.push("/dashboard/jobs/create")}
+            className="mb-4"
+          >
+            Post New Job
+          </Button>
+        ) : (
+          <Button disabled className="mb-4">
+            Post New Job
+          </Button>
+        )}
       </div>
 
       <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">

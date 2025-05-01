@@ -21,8 +21,9 @@ import { User } from "@/types/type";
 import { CustomPagination } from "@/components/AdminPagnation";
 import { StatCard } from "@/components/AdminStatCard";
 import UserModal from "@/components/AdminModal/UsersModal";
-import { Building, Users, Briefcase, FileUser} from "lucide-react"
+import { Building, Users, Briefcase, FileUser, Search } from "lucide-react"
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 
 export default function AdminDashboard() {
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
   const [companys, setCompanys] = useState<any[]>([]);
   const [seekers, setSeekers] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [searchEmail, setSearchEmail] = useState<string>("");
   const itemPerPage = 8;
   const router = useRouter();
 
@@ -135,7 +137,10 @@ export default function AdminDashboard() {
 
   const indexOfLastUser = currentPage * itemPerPage;
   const indexOfFirstUser = indexOfLastUser - itemPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const filteredUsers = users.filter(user => 
+    user.email.toLowerCase().includes(searchEmail.toLowerCase())
+  );
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -185,8 +190,22 @@ export default function AdminDashboard() {
 
       <Card className="shadow-md border border-gray-200">
         <CardHeader>
-          <CardTitle>User Management</CardTitle>
-          <CardDescription>List of all registered users</CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>List of all registered users</CardDescription>
+            </div>
+            <div className="relative">
+              <Input
+                type="email"
+                placeholder="Search by email..."
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                className="max-w-sm pr-10"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
@@ -224,7 +243,7 @@ export default function AdminDashboard() {
 
           <div className="flex justify-center mt-6">
             <CustomPagination
-              totalUsers={users.length}
+              totalUsers={filteredUsers.length}
               itemPerPage={itemPerPage}
               currentPage={currentPage}
               paginate={paginate}
