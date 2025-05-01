@@ -132,6 +132,7 @@ export interface User {
   lastname?: string;
   role: "seeker" | "company";
   company?: {
+    id?: string;
     company_name?: string;
     company_description?: string;
     company_website?: string;

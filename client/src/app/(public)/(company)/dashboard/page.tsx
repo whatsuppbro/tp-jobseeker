@@ -100,7 +100,7 @@ export default function Dashboard() {
     const { name, value } = e.target;
     setNewJob((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewJob((prev) => ({ ...prev, [name]: value }));
@@ -248,7 +248,7 @@ export default function Dashboard() {
     "Yala",
     "Yasothon",
   ];
-  
+
   return (
     <div className="container mx-auto px-4 py-12 space-y-12">
       <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
@@ -331,13 +331,19 @@ export default function Dashboard() {
             </label>
             <Select
               value={newJob.location}
-              onValueChange={(value) => setNewJob((prev) => ({ ...prev, location: value }))}
+              onValueChange={(value) =>
+                setNewJob((prev) => ({ ...prev, location: value }))
+              }
             >
               <SelectTrigger className="w-full bg-white flex items-center justify-between rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground">
                 <SelectValue placeholder="Select a Location" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem key="placeholder-location" value="placeholder" disabled>
+                <SelectItem
+                  key="placeholder-location"
+                  value="placeholder"
+                  disabled
+                >
                   Select a Location
                 </SelectItem>
                 {locations.map((loc) => (

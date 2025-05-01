@@ -10,6 +10,7 @@ import {
   updateCompany,
   deleteCompany,
   updateCompanyById,
+  getComapiesAndVerification,
 } from "@/services/company";
 import { CompanyModel, CompanyAdminModel } from "@/db/models/company";
 import {
@@ -193,4 +194,12 @@ export const companyController = new Elysia({
         body: VerificationModel,
       }
     )
+    .get(`/verification/all`, async () => {
+      try {
+        const companies = await getComapiesAndVerification();
+        return SuccessHandler(companies);
+      } catch (error) {
+        return ErrorHandler(error);
+      }
+    })
 );

@@ -36,6 +36,13 @@ export const getUserById = async (id: string) => {
           created_at: false,
           updated_at: false,
         },
+        with: {
+          verified: {
+            columns: {
+              status: true,
+            },
+          },
+        },
       },
       seeker: {
         columns: {

@@ -64,7 +64,11 @@ export default function AdminVerification() {
     fetchData();
   }, []);
 
-  const handleVerification = async (id: string, action: string, reason?: string) => {
+  const handleVerification = async (
+    id: string,
+    action: string,
+    reason?: string
+  ) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/verification/${id}`,
@@ -82,7 +86,6 @@ export default function AdminVerification() {
       }
 
       toast.success("Verification status updated successfully");
-      // Refresh data
       const updatedResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/verifications`
       );
@@ -96,8 +99,10 @@ export default function AdminVerification() {
 
   const indexOfLastItem = currentPage * itemPerPage;
   const indexOfFirstItem = indexOfLastItem - itemPerPage;
-  const filteredData = data.filter(verification => 
-    verification.company.company_email.toLowerCase().includes(searchEmail.toLowerCase())
+  const filteredData = data.filter((verification) =>
+    verification.company.company_email
+      .toLowerCase()
+      .includes(searchEmail.toLowerCase())
   );
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
@@ -171,14 +176,22 @@ export default function AdminVerification() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleVerification(item.id, "approve")}
+                            onClick={() =>
+                              handleVerification(item.id, "approve")
+                            }
                           >
                             Approve
                           </Button>
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => handleVerification(item.id, "reject", "Document verification failed")}
+                            onClick={() =>
+                              handleVerification(
+                                item.id,
+                                "reject",
+                                "Document verification failed"
+                              )
+                            }
                           >
                             Reject
                           </Button>
@@ -216,4 +229,4 @@ export default function AdminVerification() {
       </Card>
     </div>
   );
-} 
+}

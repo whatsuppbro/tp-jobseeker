@@ -39,3 +39,12 @@ export const updateVerified = async (
 
   return { message: "Update verified", data: result[0] };
 };
+
+export const createVerified = async (body: VerifiedType) => {
+  const result = await db
+    .insert(verification)
+    .values(body)
+    .returning()
+    .execute();
+  return { message: "Create verified", data: result[0] };
+};
