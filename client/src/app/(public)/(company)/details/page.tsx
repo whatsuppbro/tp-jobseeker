@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { User } from "@/types/type";
+import CompanyVerification from "@/components/CompanyVerification";
 
 export default function Details() {
   const router = useRouter();
@@ -209,7 +210,12 @@ export default function Details() {
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <ProfileSection title="Profile Strength">
+            <ProfileSection
+              title="Profile Strength"
+              headerContent={
+                <CompanyVerification companyId={user.company?.id || ""} />
+              }
+            >
               <div className="w-full bg-gray-100 rounded-full h-2">
                 <div
                   className="bg-blue-600 rounded-full h-2"
@@ -230,13 +236,18 @@ export default function Details() {
 function ProfileSection({
   title,
   children,
+  headerContent,
 }: {
   title: string;
   children: React.ReactNode;
+  headerContent?: React.ReactNode;
 }) {
   return (
     <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">{title}</h2>
+        {headerContent && <div>{headerContent}</div>}
+      </div>
       {children}
     </div>
   );

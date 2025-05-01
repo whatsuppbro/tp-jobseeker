@@ -34,6 +34,9 @@ export interface JobwithCompany {
     company_address: string;
     company_city: string;
     company_country: string;
+    verified: {
+      status: string;
+    };
     image_url: string;
   };
   applications: {
@@ -132,6 +135,7 @@ export interface User {
   lastname?: string;
   role: "seeker" | "company";
   company?: {
+    id?: string;
     company_name?: string;
     company_description?: string;
     company_website?: string;

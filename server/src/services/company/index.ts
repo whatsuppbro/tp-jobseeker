@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import db from "@/db";
 import * as table from "@/db/schema";
 import { CompanyType, CompanyAdminType } from "@/db/models/company";
+import { VerifiedType } from "@/db/models/verification";
 import { t } from "elysia";
 
 export const getCompanies = async () => {
@@ -15,9 +16,34 @@ export const getCompanies = async () => {
   return companies;
 };
 
+export const getComapiesAndVerification = async () => {
+  const companies = await db.query.company.findMany({
+    with: {
+      verified: {
+        columns: {
+          created_at: false,
+          updated_at: false,
+        },
+      },
+    },
+    columns: {
+      created_at: false,
+      updated_at: false,
+    },
+  });
+  return companies;
+};
+
 export const getCompanyById = async (id: string) => {
   const company = await db.query.company.findFirst({
     where: eq(table.company.id, id),
+    with: {
+      verified: {
+        columns: {
+          status: true,
+        },
+      },
+    },
     columns: {
       created_at: false,
       updated_at: false,
