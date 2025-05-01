@@ -4,9 +4,11 @@ import {
   getVerifiedByCompany,
   updateVerified,
   createVerified,
+  updateVerifiedStatus,
 } from "@/services/company/verification";
 import { getAllVerified } from "@/services/company/verification/index";
 import { VerifiedType, VerificationModel } from "@/db/models/verification";
+import { VerificationModelStatus } from "@/db/models/verification";
 import { t } from "elysia";
 import { ErrorHandler, SuccessHandler } from "@/utils/Handler";
 
@@ -71,4 +73,21 @@ export const verificationController = new Elysia({
         return ErrorHandler(error);
       }
     })
+    .put(
+      "/status/:id",
+      async ({ params, body }) => {
+        try {
+          const verified = await updateVerifiedStatus(params.id, body.status);
+          return SuccessHandler(verified);
+        } catch (error) {
+          return ErrorHandler(error);
+        }
+      },
+      {
+        params: t.Object({
+          id: t.String(),
+        }),
+        body: VerificationModelStatus,
+      }
+    )
 );

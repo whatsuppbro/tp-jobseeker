@@ -10,7 +10,6 @@ export const getJobs = async () => {
       applications: true,
     },
     columns: {
-      
       updated_at: false,
     },
   });
@@ -30,7 +29,15 @@ export const getJobsById = async (id: string) => {
   const jobs = await db.query.jobs.findFirst({
     where: eq(table.jobs.id, id),
     with: {
-      company: true,
+      company: {
+        with: {
+          verified: {
+            columns: {
+              status: true,
+            },
+          },
+        },
+      },
       applications: { with: { user: true } },
     },
     columns: {

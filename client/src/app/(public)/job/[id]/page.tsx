@@ -9,6 +9,7 @@ import {
 import ApplyButtonWrapper from "@/components/ApplyButton";
 import { JobwithCompany } from "@/types/type";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export default async function JobDetail({
@@ -54,7 +55,18 @@ export default async function JobDetail({
 
         <Card>
           <CardHeader>
-            <CardTitle>{job.company.company_name}</CardTitle>
+            <CardTitle>
+              {job.company.company_name}
+              {job.company?.verified?.status ? (
+                <Badge className="bg-green-100 text-green-800 border-green-300 ml-2">
+                  <span className="text-xs font-medium">"✅ Verified"</span>
+                </Badge>
+              ) : (
+                <Badge className="bg-gray-100 text-gray-800 border-gray-300 ml-2">
+                  <span className="text-xs font-medium">"❌ Not Verified"</span>
+                </Badge>
+              )}
+            </CardTitle>
             <CardDescription>About the Company</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -98,7 +110,10 @@ function ShowSignUpButtonIfNotLoggedIn() {
     return (
       <div className="flex justify-center mt-8">
         <Link href="/signup">
-          <Button size="lg" className="bg-green-600 text-white hover:bg-green-700">
+          <Button
+            size="lg"
+            className="bg-green-600 text-white hover:bg-green-700"
+          >
             Sign Up to Apply
           </Button>
         </Link>

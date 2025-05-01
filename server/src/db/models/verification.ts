@@ -23,4 +23,16 @@ export const VerificationModel = t.Object({
   ),
 });
 
+export const VerificationModelStatus = t.Object({
+  status: t.Enum(
+    {
+      verified: "verified",
+      pending: "pending",
+      rejected: "rejected",
+    },
+    { message: "Status is required" }
+  ),
+});
+
 export type VerifiedType = typeof VerificationModel.static;
+export type VerifiedStatusType = typeof VerificationModelStatus.static;

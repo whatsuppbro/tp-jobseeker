@@ -34,6 +34,9 @@ export interface JobwithCompany {
     company_address: string;
     company_city: string;
     company_country: string;
+    verified: {
+      status: string;
+    };
     image_url: string;
   };
   applications: {

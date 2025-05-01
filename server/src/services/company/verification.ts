@@ -40,6 +40,20 @@ export const updateVerified = async (
   return { message: "Update verified", data: result[0] };
 };
 
+export const updateVerifiedStatus = async (
+  id: string,
+  status: "verified" | "pending" | "rejected"
+) => {
+  const result = await db
+    .update(verification)
+    .set({ status })
+    .where(eq(verification.id, id))
+    .returning()
+    .execute();
+
+  return { message: "Update verified status", data: result[0] };
+};
+
 export const createVerified = async (body: VerifiedType) => {
   const result = await db
     .insert(verification)
