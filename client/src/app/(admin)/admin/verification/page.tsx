@@ -196,78 +196,50 @@ export default function AdminVerification() {
                   <TableRow key={item.id}>
                     <TableCell>{item.company_name}</TableCell>
                     <TableCell>{item.company_email}</TableCell>
-                    <TableCell>{item.verified.document_type}</TableCell>
+                    <TableCell>{item.verified?.document_type || 'N/A'}</TableCell>
                     <TableCell>
-                      <StatusBadge status={item.verified.status} />
+                      <StatusBadge status={item.verified?.status || 'unverified'} />
                     </TableCell>
-                    <TableCell className="flex justify-center gap-2">
-                      {item.verified.status === "pending" && (
-                        <>
+                    <TableCell className="text-center">
+                      {item.verified?.status === 'pending' && (
+                        <div className="flex justify-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              handleVerification(item.verified.id, "verified")
-                            }
-                            className="bg-green-500 hover:bg-green-600 text-white border-transparent"
+                            onClick={() => handleVerification(item.verified.id, 'verified')}
+                            className="bg-green-50 text-green-700 hover:bg-green-100"
                           >
-                            Verified
+                            Approve
                           </Button>
                           <Button
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
-                            onClick={() =>
-                              handleVerification(item.verified.id, "rejected")
-                            }
-                            className="bg-red-500 hover:bg-red-600 text-white border-transparent"
+                            onClick={() => handleVerification(item.verified.id, 'rejected')}
+                            className="bg-red-50 text-red-700 hover:bg-red-100"
                           >
-                            Rejected
+                            Reject
                           </Button>
-                        </>
-                      )}
-                      {item.verified.status === "verified" && (
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() =>
-                            handleVerification(item.verified.id, "rejected")
-                          }
-                          className="bg-red-500 hover:bg-red-600 text-white border-transparent"
-                        >
-                          Rejected
-                        </Button>
-                      )}
-                      {item.verified.status === "rejected" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleVerification(item.verified.id, "verified")
-                          }
-                          className="bg-green-500 hover:bg-green-600 text-white border-transparent"
-                        >
-                          Verified
-                        </Button>
+                        </div>
                       )}
                     </TableCell>
-
                     <TableCell className="text-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          window.open(item.image_url || "#", "_blank")
-                        }
-                      >
-                        View Document
-                      </Button>
+                      {item.verified?.verified_url && (
+                        <a
+                          href={item.verified.verified_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          View Document
+                        </a>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500">
-                    No verifications found.
+                  <TableCell colSpan={6} className="text-center py-4">
+                    No verification requests found
                   </TableCell>
                 </TableRow>
               )}

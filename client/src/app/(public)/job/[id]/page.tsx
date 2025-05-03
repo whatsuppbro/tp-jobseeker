@@ -11,6 +11,7 @@ import { JobwithCompany } from "@/types/type";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
 
 export default async function JobDetail({
   params,
@@ -57,14 +58,8 @@ export default async function JobDetail({
           <CardHeader>
             <CardTitle>
               {job.company.company_name}
-              {job.company?.verified?.status ? (
-                <Badge className="bg-green-100 text-green-800 border-green-300 ml-2">
-                  <span className="text-xs font-medium">"✅ Verified"</span>
-                </Badge>
-              ) : (
-                <Badge className="bg-gray-100 text-gray-800 border-gray-300 ml-2">
-                  <span className="text-xs font-medium">"❌ Not Verified"</span>
-                </Badge>
+              {job.company?.verified?.status === "verified" && (
+                <ShieldCheck className="w-4.5 h-4.5 inline-block ml-1 align-text-bottom text-inherit" />
               )}
             </CardTitle>
             <CardDescription>About the Company</CardDescription>

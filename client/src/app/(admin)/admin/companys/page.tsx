@@ -25,13 +25,28 @@ import { Building, Users, Briefcase, FileUser, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface CompanyWithVerification extends Company {
-  verification?: {
-    status: string;
-    document_url?: string;
+  verified?: {
+    id?: string;
+    company_id?: string;
+    verified_url?: string;
+    verified_description?: string;
     document_type?: string;
-    rejection_reason?: string;
+    status?: string;
   };
 }
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const styles: Record<string, string> = {
+    verified: "bg-green-500 text-white",
+    pending: "bg-yellow-500 text-white",
+    rejected: "bg-red-500 text-white",
+    unverified: "bg-gray-400 text-white",
+  };
+  const label = status.charAt(0).toUpperCase() + status.slice(1);
+  return (
+    <span className={`inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-semibold min-w-[100px] text-center ${styles[status] || styles.unverified}`}>{label}</span>
+  );
+};
 
 export default function AdminCompany() {
   const [data, setData] = useState<CompanyWithVerification[]>([]);
@@ -44,34 +59,14 @@ export default function AdminCompany() {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/company`
+          `${process.env.NEXT_PUBLIC_API_URL}/company/verification/all`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch Company");
+          throw new Error("Failed to fetch Company and Verification");
         }
         const data = await response.json();
-
         if (Array.isArray(data.data)) {
-          // Fetch verification status for each company
-          const companiesWithVerification = await Promise.all(
-            data.data.map(async (company: Company) => {
-              const verificationResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/company/${company.id}/verification`
-              );
-              if (verificationResponse.ok) {
-                const verificationData = await verificationResponse.json();
-                return {
-                  ...company,
-                  verification: verificationData.data,
-                };
-              }
-              return {
-                ...company,
-                verification: { status: "unverified" },
-              };
-            })
-          );
-          setData(companiesWithVerification);
+          setData(data.data);
         } else {
           console.error("Unexpected data format:", data);
           toast.error("Unexpected data format received from the server.");
@@ -122,13 +117,13 @@ export default function AdminCompany() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "verified":
-        return "bg-green-100 text-green-800";
+        return "bg-green-50 text-green-700 hover:bg-green-100";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "rejected":
-        return "bg-red-100 text-red-800";
+        return "bg-red-50 text-red-700 hover:bg-red-100";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-50 text-gray-700";
     }
   };
 
@@ -178,7 +173,9 @@ export default function AdminCompany() {
                 <TableHead className="w-[250px]">Email</TableHead>
                 <TableHead className="w-[150px]">Phone</TableHead>
                 <TableHead className="w-[150px]">City</TableHead>
-                <TableHead className="w-[150px]">Verification</TableHead>
+                <TableHead className="w-[150px]">Document Type</TableHead>
+                <TableHead className="w-[150px] text-center">Documents</TableHead>
+                <TableHead className="w-[150px] text-center">Status</TableHead>
                 <TableHead className="w-[150px] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -190,39 +187,42 @@ export default function AdminCompany() {
                     <TableCell>{company.company_email}</TableCell>
                     <TableCell>{company.company_phone}</TableCell>
                     <TableCell>{company.company_city}</TableCell>
+                    <TableCell>{company.verified?.document_type || '-'}</TableCell>
+                    <TableCell className="flex justify-center gap-2">
+                      {company.verified?.verified_url && (
+                        <a
+                          href={company.verified.verified_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          View Document
+                        </a>
+                      )}
+                    </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(company.verification?.status || "unverified")}>
-                        {company.verification?.status || "Unverified"}
-                      </Badge>
+                      <StatusBadge status={company.verified?.status || "unverified"} />
                     </TableCell>
                     <TableCell className="flex justify-center gap-2">
-                      <CompanyModal Id={company.id} Data={company} />
-                      {company.verification?.status === "pending" && (
+                      {company.verified?.status === "pending" && (
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
                             size="sm"
+                            className="bg-green-50 text-green-700 hover:bg-green-100 rounded-full px-4 py-1 text-sm font-semibold"
                             onClick={() => handleVerification(company.id, "approve")}
                           >
                             Approve
                           </Button>
                           <Button
-                            variant="destructive"
+                            variant="outline"
                             size="sm"
+                            className="bg-red-50 text-red-700 hover:bg-red-100 rounded-full px-4 py-1 text-sm font-semibold"
                             onClick={() => handleVerification(company.id, "reject", "Document verification failed")}
                           >
                             Reject
                           </Button>
                         </div>
-                      )}
-                      {company.verification?.document_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(company.verification?.document_url, "_blank")}
-                        >
-                          View Document
-                        </Button>
                       )}
                     </TableCell>
                   </TableRow>

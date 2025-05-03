@@ -68,15 +68,6 @@ export default function AdminSidebar() {
               Applications
             </Button>
           </Link>
-          <Link href="/admin/verification">
-            <Button
-              variant="ghost"
-              className="w-full justify-start cursor-pointer"
-            >
-              <CheckCircle className="mr-2" />
-              Verification
-            </Button>
-          </Link>
         </nav>
       </div>
 

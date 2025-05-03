@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { ShieldCheck } from "lucide-react";
 
 const verificationSchema = z.object({
   verified_url: z.string().url("Must be a valid URL"),
@@ -68,8 +69,8 @@ export default function CompanyVerification({
         );
         const data = await res.json();
 
-        if (data?.data.verified?.status) {
-          const currentStatus = data.data.verified.status.toLowerCase();
+        if (data?.data?.verified) {
+          const currentStatus = data.data.verified.status?.toLowerCase();
 
           if (
             currentStatus === "verified" ||
@@ -140,12 +141,13 @@ export default function CompanyVerification({
       <Badge
         className={
           isVerified
-            ? "bg-green-100 text-green-800 border-green-300"
+            ? "w-4.5 h-4.5 inline-block ml-1 align-text-bottom text-inherit"
             : "bg-yellow-100 text-yellow-800 border-yellow-300"
         }
       >
-        <span className="text-xs font-medium">
-          {isVerified ? "✅ Verified" : "⏳ Pending"}
+        <span className="text-xs font-medium flex items-center gap-1">
+          {isVerified ? <ShieldCheck className="w-4 h-4 text-green-700" /> : "⏳"}
+          {isVerified ? "Verified" : "Pending"}
         </span>
       </Badge>
     );
