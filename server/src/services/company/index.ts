@@ -21,7 +21,6 @@ export const getComapiesAndVerification = async () => {
     with: {
       verified: {
         columns: {
-          created_at: false,
           updated_at: false,
         },
       },

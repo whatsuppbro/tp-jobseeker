@@ -21,8 +21,7 @@ import { toast } from "sonner";
 import { Company } from "@/types/type";
 import CompanyModal from "@/components/AdminModal/CompanysModal";
 import { Input } from "@/components/ui/input";
-import { Building, Users, Briefcase, FileUser, Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
 
 interface CompanyWithVerification extends Company {
   verified?: {
@@ -32,6 +31,7 @@ interface CompanyWithVerification extends Company {
     verified_description?: string;
     document_type?: string;
     status?: string;
+    created_at?: string;
   };
 }
 
@@ -44,7 +44,13 @@ const StatusBadge = ({ status }: { status: string }) => {
   };
   const label = status.charAt(0).toUpperCase() + status.slice(1);
   return (
-    <span className={`inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-semibold min-w-[100px] text-center ${styles[status] || styles.unverified}`}>{label}</span>
+    <span
+      className={`inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-semibold min-w-[100px] text-center ${
+        styles[status] || styles.unverified
+      }`}
+    >
+      {label}
+    </span>
   );
 };
 
@@ -65,6 +71,7 @@ export default function AdminCompany() {
           throw new Error("Failed to fetch Company and Verification");
         }
         const data = await response.json();
+        console.log("API Response:", data);
         if (Array.isArray(data.data)) {
           setData(data.data);
         } else {
@@ -84,7 +91,11 @@ export default function AdminCompany() {
     fetchData();
   }, []);
 
-  const handleVerification = async (companyId: string, action: string, reason?: string) => {
+  const handleVerification = async (
+    companyId: string,
+    action: string,
+    reason?: string
+  ) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/verification/${companyId}`,
@@ -114,22 +125,9 @@ export default function AdminCompany() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "verified":
-        return "bg-green-50 text-green-700 hover:bg-green-100";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "rejected":
-        return "bg-red-50 text-red-700 hover:bg-red-100";
-      default:
-        return "bg-gray-50 text-gray-700";
-    }
-  };
-
   const indexOfLastUser = currentPage * itemPerPage;
   const indexOfFirstUser = indexOfLastUser - itemPerPage;
-  const filteredData = data.filter(company => 
+  const filteredData = data.filter((company) =>
     company.company_email.toLowerCase().includes(searchEmail.toLowerCase())
   );
   const currentUsers = filteredData.slice(indexOfFirstUser, indexOfLastUser);
@@ -169,13 +167,13 @@ export default function AdminCompany() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px]">Name</TableHead>
-                <TableHead className="w-[250px]">Email</TableHead>
-                <TableHead className="w-[150px]">Phone</TableHead>
-                <TableHead className="w-[150px]">City</TableHead>
-                <TableHead className="w-[150px]">Document Type</TableHead>
-                <TableHead className="w-[150px] text-center">Documents</TableHead>
-                <TableHead className="w-[150px] text-center">Status</TableHead>
+                <TableHead className="w-[200px]">Company Name</TableHead>
+                <TableHead className="w-[200px]">Email</TableHead>
+                <TableHead className="w-[120px]">Phone</TableHead>
+                <TableHead className="w-[150px] text-center">Verification Date</TableHead>
+                <TableHead className="w-[120px]">Document Type</TableHead>
+                <TableHead className="w-[100px] text-center">Documents</TableHead>
+                <TableHead className="w-[100px] text-center">Status</TableHead>
                 <TableHead className="w-[150px] text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -183,29 +181,43 @@ export default function AdminCompany() {
               {currentUsers.length > 0 ? (
                 currentUsers.map((company) => (
                   <TableRow key={company.id}>
-                    <TableCell>{company.company_name}</TableCell>
+                    <TableCell className="font-medium">{company.company_name}</TableCell>
                     <TableCell>{company.company_email}</TableCell>
                     <TableCell>{company.company_phone}</TableCell>
-                    <TableCell>{company.company_city}</TableCell>
-                    <TableCell>{company.verified?.document_type || '-'}</TableCell>
-                    <TableCell className="flex justify-center gap-2">
-                      {company.verified?.verified_url && (
+                    <TableCell className="text-center">
+                      {company.verified?.created_at ? (
+                        <span className="text-sm text-gray-600">
+                          {new Date(company.verified.created_at).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{company.verified?.document_type || "-"}</TableCell>
+                    <TableCell className="text-center">
+                      {company.verified?.verified_url ? (
                         <a
                           href={company.verified.verified_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
                         >
-                          View Document
+                          View
                         </a>
+                      ) : (
+                        <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <StatusBadge status={company.verified?.status || "unverified"} />
                     </TableCell>
-                    <TableCell className="flex justify-center gap-2">
+                    <TableCell className="text-center">
                       {company.verified?.status === "pending" && (
-                        <div className="flex gap-2">
+                        <div className="flex justify-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
@@ -218,7 +230,9 @@ export default function AdminCompany() {
                             variant="outline"
                             size="sm"
                             className="bg-red-50 text-red-700 hover:bg-red-100 rounded-full px-4 py-1 text-sm font-semibold"
-                            onClick={() => handleVerification(company.id, "reject", "Document verification failed")}
+                            onClick={() =>
+                              handleVerification(company.id, "reject", "Document verification failed")
+                            }
                           >
                             Reject
                           </Button>
@@ -229,8 +243,8 @@ export default function AdminCompany() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-500">
-                    No data found.
+                  <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                    No companies found.
                   </TableCell>
                 </TableRow>
               )}
