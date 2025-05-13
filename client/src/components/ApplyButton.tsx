@@ -157,7 +157,7 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
 
   if (!user?.seeker) {
     return (
-      <div className="flex justify-center mt-4">
+      <div className="cursor-pointer flex justify-center mt-4">
         <Button onClick={() => router.push("/profile/edit")} size="lg">
           Edit Personal Information
         </Button>
@@ -165,7 +165,7 @@ export default function ApplyButton({ jobId, applications }: ApplyButtonProps) {
     );
   }
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center mt-4 cursor-pointer">
       <Button
         onClick={handleApply}
         disabled={!!applicationStatus || isLoading}

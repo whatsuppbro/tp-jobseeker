@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,20 +19,21 @@ import {
 import { CustomPagination } from "@/components/AdminPagnation";
 import { toast } from "sonner";
 import { Company } from "@/types/type";
-import CompanyModal from "@/components/AdminModal/CompanysModal";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
+interface VerifiedInfo {
+  id: string;
+  company_id: string;
+  verified_url: string;
+  verified_description: string;
+  document_type: string;
+  status: "verified" | "pending" | "rejected";
+  created_at: string;
+}
+
 interface CompanyWithVerification extends Company {
-  verified?: {
-    id?: string;
-    company_id?: string;
-    verified_url?: string;
-    verified_description?: string;
-    document_type?: string;
-    status?: string;
-    created_at?: string;
-  };
+  verified?: VerifiedInfo;
 }
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -45,7 +46,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   const label = status.charAt(0).toUpperCase() + status.slice(1);
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-semibold min-w-[100px] text-center ${
+      className={`inline-flex items-center justify-center rounded-full px-4 py-1 text-sm font-semibold min-w-[100px] ${
         styles[status] || styles.unverified
       }`}
     >
@@ -59,97 +60,85 @@ export default function AdminCompany() {
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchEmail, setSearchEmail] = useState<string>("");
+
   const itemPerPage = 8;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/company/verification/all`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch Company and Verification");
-        }
-        const data = await response.json();
-        console.log("API Response:", data);
-        if (Array.isArray(data.data)) {
-          setData(data.data);
-        } else {
-          console.error("Unexpected data format:", data);
-          toast.error("Unexpected data format received from the server.");
-        }
-      } catch (error) {
-        console.error("Error fetching Company:", error);
-        toast.error(
-          "An error occurred while fetching Company. Please try again."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchCompanyData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/company/verification/all`);
+      const json = await res.json();
 
-    fetchData();
+      if (!res.ok) throw new Error(json.message || "Failed to fetch");
+
+      if (Array.isArray(json.data)) {
+        setData(json.data);
+      } else {
+        toast.error("Unexpected data format received.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load company data.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchCompanyData();
+  }, [fetchCompanyData]);
+
   const handleVerification = async (
-    companyId: string,
+    verificationId: string,
     action: string,
-    reason?: string
+    reason?: string,
+    status?: "verified" | "rejected"
   ) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/admin/verification/${companyId}`,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/verification/status/${verificationId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action, reason }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, reason, status }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to update verification status");
-      }
+      if (!res.ok) throw new Error("Failed to update verification status");
 
-      toast.success("Verification status updated successfully");
-      // Refresh data
-      const updatedResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/company`
-      );
-      const updatedData = await updatedResponse.json();
-      setData(updatedData.data);
+      toast.success("Status updated successfully.");
+      await fetchCompanyData();
     } catch (error) {
-      console.error("Error updating verification:", error);
-      toast.error("Failed to update verification status");
+      console.error("Verification update error:", error);
+      toast.error("Failed to update verification.");
     }
   };
 
-  const indexOfLastUser = currentPage * itemPerPage;
-  const indexOfFirstUser = indexOfLastUser - itemPerPage;
   const filteredData = data.filter((company) =>
-    company.company_email.toLowerCase().includes(searchEmail.toLowerCase())
+    company.company_email?.toLowerCase().includes(searchEmail.toLowerCase())
   );
-  const currentUsers = filteredData.slice(indexOfFirstUser, indexOfLastUser);
 
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const currentUsers = filteredData.slice(
+    (currentPage - 1) * itemPerPage,
+    currentPage * itemPerPage
+  );
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 p-8">
-        <p className="text-lg text-gray-500">Loading users...</p>
+      <div className="container mx-auto px-4 py-12">
+        <p className="text-lg text-gray-500">Loading companies...</p>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-12">
-      <Card className="shadow-md border border-gray-200 ">
+      <Card className="shadow-md border">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Company Management</CardTitle>
-              <CardDescription>List of all registered Company</CardDescription>
+              <CardDescription>List of all registered companies</CardDescription>
             </div>
             <div className="relative">
               <Input
@@ -167,32 +156,30 @@ export default function AdminCompany() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px]">Company Name</TableHead>
-                <TableHead className="w-[200px]">Email</TableHead>
-                <TableHead className="w-[120px]">Phone</TableHead>
-                <TableHead className="w-[150px] text-center">Verification Date</TableHead>
-                <TableHead className="w-[120px]">Document Type</TableHead>
-                <TableHead className="w-[100px] text-center">Documents</TableHead>
-                <TableHead className="w-[100px] text-center">Status</TableHead>
-                <TableHead className="w-[150px] text-center">Actions</TableHead>
+                <TableHead>Company Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead className="text-center">Verification Date</TableHead>
+                <TableHead>Document Type</TableHead>
+                <TableHead className="text-center">Documents</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {currentUsers.length > 0 ? (
                 currentUsers.map((company) => (
                   <TableRow key={company.id}>
-                    <TableCell className="font-medium">{company.company_name}</TableCell>
+                    <TableCell>{company.company_name}</TableCell>
                     <TableCell>{company.company_email}</TableCell>
                     <TableCell>{company.company_phone}</TableCell>
                     <TableCell className="text-center">
                       {company.verified?.created_at ? (
-                        <span className="text-sm text-gray-600">
-                          {new Date(company.verified.created_at).toLocaleDateString("en-GB", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </span>
+                        new Date(company.verified.created_at).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })
                       ) : (
                         <span className="text-sm text-gray-400">-</span>
                       )}
@@ -219,19 +206,24 @@ export default function AdminCompany() {
                       {company.verified?.status === "pending" && (
                         <div className="flex justify-center gap-2">
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="bg-green-50 text-green-700 hover:bg-green-100 rounded-full px-4 py-1 text-sm font-semibold"
-                            onClick={() => handleVerification(company.id, "approve")}
+                            className="cursor-pointer bg-green-50 text-green-700 hover:bg-green-100 rounded-full px-4 py-1 text-sm font-semibold"
+                            onClick={() =>
+                              handleVerification(company.verified!.id, "approve", "", "verified")
+                            }
                           >
                             Approve
                           </Button>
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="bg-red-50 text-red-700 hover:bg-red-100 rounded-full px-4 py-1 text-sm font-semibold"
+                            className="cursor-pointer bg-red-50 text-red-700 hover:bg-red-100 rounded-full px-4 py-1 text-sm font-semibold"
                             onClick={() =>
-                              handleVerification(company.id, "reject", "Document verification failed")
+                              handleVerification(
+                                company.verified!.id,
+                                "reject",
+                                "Document verification failed",
+                                "rejected"
+                              )
                             }
                           >
                             Reject
@@ -256,7 +248,7 @@ export default function AdminCompany() {
               totalUsers={filteredData.length}
               itemPerPage={itemPerPage}
               currentPage={currentPage}
-              paginate={paginate}
+              paginate={setCurrentPage}
             />
           </div>
         </CardContent>

@@ -141,7 +141,7 @@ export default function CompanyVerification({
       <Badge
         className={
           isVerified
-            ? "w-4.5 h-4.5 inline-block ml-1 align-text-bottom text-inherit"
+            ? "bg-green-100 text-green-800 border-green-300"
             : "bg-yellow-100 text-yellow-800 border-yellow-300"
         }
       >
