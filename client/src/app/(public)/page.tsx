@@ -73,11 +73,15 @@ export default function HomePage() {
                     {job.title}
                   </h3>
                   <p className="text-sm text-gray-500 mt-2 font-semibold">{job.location}</p>
-                  <p className="text-sm text-gray-500 mt-2">
+                  <p className="text-sm text-gray-500 mt-2 flex">
                     Salary:{" "}
-                    <span className="font-medium text-green-600">
-                      {job.salary || "Not specified"}
+                    <span className="pl-2 font-medium text-green-600 flex">
+                      {job.salary
+                        ? Number(job.salary.toString().replace(/,/g, "")).toLocaleString()
+                        : "Not specified"}
+                        <p className="pl-1">฿</p>
                     </span>
+                    
                   </p>
                   <p className="text-sm text-gray-500 mt-2">
                     Company:{" "}

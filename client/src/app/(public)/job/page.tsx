@@ -85,7 +85,7 @@ export default function Page() {
       filters.location === "All" ||
       (job.location?.toLowerCase() || "") === filters.location.toLowerCase();
 
-    const matchesSalary = 
+    const matchesSalary =
       (!filters.minSalary || Number(job.salary) >= Number(filters.minSalary)) &&
       (!filters.maxSalary || Number(job.salary) <= Number(filters.maxSalary));
 
@@ -193,7 +193,9 @@ export default function Page() {
                             variant="secondary"
                             className="text-green-600 font-medium text-base ml-2"
                           >
-                            ${job.salary}
+                            ฿{job.salary
+                              ? Number(job.salary.toString().replace(/,/g, "")).toLocaleString()
+                              : "Not specified"}
                           </Badge>
                         </div>
                         <div className="flex justify-between items-center w-full">

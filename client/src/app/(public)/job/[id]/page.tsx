@@ -43,7 +43,10 @@ export default async function JobDetail({
             </CardTitle>
             <CardTitle>{job.title}</CardTitle>
             <CardDescription>
-              Location: {job.location} | Salary: {job.salary}
+              Location: {job.location} | Salary:{" "}
+              {job.salary
+                ? Number(job.salary.toString().replace(/,/g, "")).toLocaleString()
+                : "Not specified"} ฿
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

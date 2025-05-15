@@ -74,13 +74,12 @@ export default function JobApplied() {
                 </CardTitle>
                 <div className="flex items-center gap-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm mt-2 ${
-                      app.status === "pending"
+                    className={`px-3 py-1 rounded-full text-sm mt-2 ${app.status === "pending"
                         ? "bg-yellow-100 text-yellow-800"
                         : app.status === "accepted"
-                        ? "bg-green-500 text-white"
-                        : "bg-red-500 text-white"
-                    }`}
+                          ? "bg-green-500 text-white"
+                          : "bg-red-500 text-white"
+                      }`}
                   >
                     {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                   </span>
@@ -100,7 +99,10 @@ export default function JobApplied() {
                   <strong>Location:</strong> {app.job.location}
                 </p>
                 <p>
-                  <strong>Salary:</strong> ${app.job.salary.toLocaleString()}
+                  <strong>Salary: </strong> 
+                  {app.job.salary
+                    ? Number(app.job.salary.toString().replace(/,/g, "")).toLocaleString()
+                    : "Not specified"}฿
                 </p>
                 <p>
                   <strong>Type:</strong> {app.job.job_type}
